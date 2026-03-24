@@ -151,28 +151,28 @@ export default function DashboardPage() {
 
         {/* Stats cards */}
         {taxYears.length > 0 && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
             <div className="card">
               <div className="text-sm text-slate-500 mb-1">Total Income</div>
-              <div className="text-xl font-bold text-slate-900 dark:text-white">
+              <div className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
                 {formatZAR(taxYears[0]?.totalIncome ?? 0)}
               </div>
             </div>
             <div className="card">
               <div className="text-sm text-slate-500 mb-1">Total Deductions</div>
-              <div className="text-xl font-bold text-accent-600">
+              <div className="text-lg sm:text-xl font-bold text-accent-600">
                 {formatZAR(taxYears[0]?.totalDeductions ?? 0)}
               </div>
             </div>
             <div className="card">
               <div className="text-sm text-slate-500 mb-1">Estimated Tax</div>
-              <div className="text-xl font-bold text-brand-600">
+              <div className="text-lg sm:text-xl font-bold text-brand-600">
                 {formatZAR(taxYears[0]?.taxWithDeductions ?? 0)}
               </div>
             </div>
             <div className="card">
               <div className="text-sm text-slate-500 mb-1">Tax Saved</div>
-              <div className="text-xl font-bold text-accent-600">
+              <div className="text-lg sm:text-xl font-bold text-accent-600">
                 {formatZAR(taxYears[0]?.taxSavings ?? 0)}
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function DashboardPage() {
                       {ty._count.transactions} transactions • {ty._count.deductions} deductions
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     <Link
                       href={`/upload?taxYearId=${ty.id}`}
                       className="btn-secondary py-1.5 px-3 text-xs"
@@ -253,7 +253,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <Link href="/upload" className="card hover:border-brand-300 transition-colors group">
             <Upload className="text-brand-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
             <h3 className="font-semibold mb-1">Upload Bank Statement</h3>

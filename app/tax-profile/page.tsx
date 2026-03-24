@@ -230,7 +230,7 @@ export default function TaxProfilePage() {
 
               <div className="mb-4">
                 <label className="label">Employment Type</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {[
                     { value: 'employed', label: 'Employed (salaried)', desc: 'Receive IRP5 from employer' },
                     { value: 'self_employed', label: 'Self-employed', desc: 'Freelancer / own business' },
@@ -253,7 +253,7 @@ export default function TaxProfilePage() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="label">SARS Tax Number (optional)</label>
                   <input
@@ -611,7 +611,7 @@ export default function TaxProfilePage() {
 
               <div>
                 <label className="label">Entity Type</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {[
                     { value: 'INDIVIDUAL', label: 'Individual' },
                     { value: 'COMPANY', label: 'Company (Pty Ltd)' },

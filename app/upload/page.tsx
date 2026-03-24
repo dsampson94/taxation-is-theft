@@ -380,22 +380,22 @@ function UploadContent() {
               <CheckCircle className="text-accent-600" size={20} />
               Analysis Complete
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6">
               <div>
                 <div className="text-sm text-slate-500">Transactions</div>
-                <div className="text-xl font-bold">{combinedSummary.transactions}</div>
+                <div className="text-lg sm:text-xl font-bold">{combinedSummary.transactions}</div>
               </div>
               <div>
                 <div className="text-sm text-slate-500">Total Income</div>
-                <div className="text-xl font-bold">{formatZAR(combinedSummary.totalIncome)}</div>
+                <div className="text-lg sm:text-xl font-bold">{formatZAR(combinedSummary.totalIncome)}</div>
               </div>
               <div>
                 <div className="text-sm text-slate-500">Total Expenses</div>
-                <div className="text-xl font-bold">{formatZAR(combinedSummary.totalExpenses)}</div>
+                <div className="text-lg sm:text-xl font-bold">{formatZAR(combinedSummary.totalExpenses)}</div>
               </div>
               <div>
                 <div className="text-sm text-slate-500">Deductible</div>
-                <div className="text-xl font-bold text-accent-600">
+                <div className="text-lg sm:text-xl font-bold text-accent-600">
                   {formatZAR(combinedSummary.totalDeductible)}
                 </div>
               </div>

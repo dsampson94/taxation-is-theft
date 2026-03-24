@@ -173,7 +173,7 @@ export default function PricingPage() {
       <section className="py-16 bg-slate-50 dark:bg-slate-950">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           {/* Credit plans */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
             {PLANS.map(plan => {
               const Icon = plan.icon;
               return (
@@ -202,7 +202,7 @@ export default function PricingPage() {
                     </div>
                   </div>
 
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
                         <Check size={16} className="text-accent-500 mt-0.5 shrink-0" />
@@ -225,7 +225,7 @@ export default function PricingPage() {
 
           {/* Tax Season Bundle - special highlight */}
           <div className="card bg-gradient-to-r from-emerald-50 to-accent-50 dark:from-emerald-950/30 dark:to-accent-950/30 border-emerald-200 dark:border-emerald-800">
-            <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <FileText className="text-emerald-600" size={24} />
@@ -284,7 +284,7 @@ export default function PricingPage() {
       {/* Trust signals */}
       <section className="py-12 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-3 gap-8 text-center">
+          <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 text-center">
             <div>
               <Shield className="mx-auto text-emerald-600 mb-2" size={28} />
               <h4 className="font-semibold mb-1">Secure Payments</h4>

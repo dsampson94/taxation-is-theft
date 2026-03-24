@@ -158,12 +158,12 @@ function TransactionsContent() {
             ))}
           </select>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {(['all', 'income', 'expense', 'deductible'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                   filter === f
                     ? 'bg-brand-600 text-white'
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
@@ -177,7 +177,7 @@ function TransactionsContent() {
 
         {/* Summary bar */}
         {summary && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6">
             <div className="card py-3 px-4">
               <div className="text-xs text-slate-500">Total</div>
               <div className="font-bold">{summary.transactionCount}</div>
@@ -214,32 +214,32 @@ function TransactionsContent() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                  <th className="text-left py-3 px-4 font-medium text-slate-500">Date</th>
-                  <th className="text-left py-3 px-4 font-medium text-slate-500">Description</th>
-                  <th className="text-right py-3 px-4 font-medium text-slate-500">Amount</th>
-                  <th className="text-left py-3 px-4 font-medium text-slate-500">Category</th>
-                  <th className="text-center py-3 px-4 font-medium text-slate-500">Deductible</th>
-                  <th className="text-center py-3 px-4 font-medium text-slate-500">Actions</th>
+                  <th className="text-left py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Date</th>
+                  <th className="text-left py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Description</th>
+                  <th className="text-right py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Amount</th>
+                  <th className="text-left py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm hidden sm:table-cell">Category</th>
+                  <th className="text-center py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm hidden sm:table-cell">Deductible</th>
+                  <th className="text-center py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(tx => (
                   <tr key={tx.id} className="border-b border-slate-100 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="py-2.5 px-4 whitespace-nowrap text-slate-500">
+                    <td className="py-2.5 px-3 sm:px-4 whitespace-nowrap text-slate-500 text-xs sm:text-sm">
                       {new Date(tx.date).toLocaleDateString('en-ZA')}
                     </td>
-                    <td className="py-2.5 px-4 max-w-[250px] truncate" title={tx.description}>
+                    <td className="py-2.5 px-3 sm:px-4 max-w-[150px] sm:max-w-[250px] truncate text-xs sm:text-sm" title={tx.description}>
                       {tx.description}
                       {tx.notes && (
                         <div className="text-xs text-slate-400 truncate">{tx.notes}</div>
                       )}
                     </td>
-                    <td className={`py-2.5 px-4 text-right font-medium whitespace-nowrap ${
+                    <td className={`py-2.5 px-3 sm:px-4 text-right font-medium whitespace-nowrap text-xs sm:text-sm ${
                       tx.type === 'INCOME' ? 'text-accent-600' : 'text-slate-900 dark:text-slate-100'
                     }`}>
                       {tx.type === 'INCOME' ? '+' : '-'}{formatZAR(Math.abs(Number(tx.amount)))}
                     </td>
-                    <td className="py-2.5 px-4">
+                    <td className="py-2.5 px-3 sm:px-4 hidden sm:table-cell">
                       {editingId === tx.id ? (
                         <select
                           value={editData.category}
@@ -257,7 +257,7 @@ function TransactionsContent() {
                         </span>
                       )}
                     </td>
-                    <td className="py-2.5 px-4 text-center">
+                    <td className="py-2.5 px-3 sm:px-4 text-center hidden sm:table-cell">
                       {editingId === tx.id ? (
                         <div className="flex items-center justify-center gap-2">
                           <input
@@ -283,7 +283,7 @@ function TransactionsContent() {
                         <XCircle size={14} className="mx-auto text-slate-300" />
                       )}
                     </td>
-                    <td className="py-2.5 px-4 text-center">
+                    <td className="py-2.5 px-3 sm:px-4 text-center">
                       {editingId === tx.id ? (
                         <button onClick={saveEdit} className="text-accent-600 hover:text-accent-700">
                           <Save size={16} />

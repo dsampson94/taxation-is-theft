@@ -162,11 +162,11 @@ function ReportContent() {
             {/* Tax savings highlight */}
             {report.taxSaved > 0 && (
               <div className="card bg-gradient-to-r from-accent-500 to-accent-600 text-white border-0">
-                <div className="flex items-center gap-4">
-                  <TrendingDown size={40} />
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <TrendingDown size={32} className="shrink-0 sm:w-10 sm:h-10" />
                   <div>
                     <div className="text-sm opacity-80">Your Estimated Tax Savings</div>
-                    <div className="text-3xl font-bold">{formatZAR(report.taxSaved)}</div>
+                    <div className="text-2xl sm:text-3xl font-bold">{formatZAR(report.taxSaved)}</div>
                     <div className="text-sm opacity-80">
                       Effective rate reduced from {report.effectiveRateWithout.toFixed(1)}% to {report.effectiveRateWith.toFixed(1)}%
                     </div>
@@ -176,25 +176,25 @@ function ReportContent() {
             )}
 
             {/* Main numbers */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
               <div className="card">
                 <div className="text-sm text-slate-500 mb-1">Total Income</div>
-                <div className="text-xl font-bold">{formatZAR(report.totalIncome)}</div>
+                <div className="text-lg sm:text-xl font-bold">{formatZAR(report.totalIncome)}</div>
                 <div className="text-xs text-slate-400">{report.incomeCount} transactions</div>
               </div>
               <div className="card">
                 <div className="text-sm text-slate-500 mb-1">Total Deductions</div>
-                <div className="text-xl font-bold text-accent-600">{formatZAR(report.totalDeductions)}</div>
+                <div className="text-lg sm:text-xl font-bold text-accent-600">{formatZAR(report.totalDeductions)}</div>
                 <div className="text-xs text-slate-400">{report.deductibleCount} deductible items</div>
               </div>
               <div className="card">
                 <div className="text-sm text-slate-500 mb-1">Taxable Income</div>
-                <div className="text-xl font-bold">{formatZAR(report.taxableIncomeWithDeductions)}</div>
+                <div className="text-lg sm:text-xl font-bold">{formatZAR(report.taxableIncomeWithDeductions)}</div>
                 <div className="text-xs text-slate-400">after deductions</div>
               </div>
               <div className="card">
                 <div className="text-sm text-slate-500 mb-1">Estimated Tax</div>
-                <div className="text-xl font-bold text-brand-600">{formatZAR(report.taxWithDeductions)}</div>
+                <div className="text-lg sm:text-xl font-bold text-brand-600">{formatZAR(report.taxWithDeductions)}</div>
                 <div className="text-xs text-slate-400">
                   without deductions: {formatZAR(report.taxWithoutDeductions)}
                 </div>
@@ -280,14 +280,14 @@ function ReportContent() {
                       const maxIncome = Math.max(...Object.values(report.monthlyIncome));
                       return (
                         <div key={month} className="flex items-center gap-3">
-                          <span className="text-sm text-slate-500 w-20">{month}</span>
+                          <span className="text-xs sm:text-sm text-slate-500 w-16 sm:w-20">{month}</span>
                           <div className="flex-1 h-6 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden">
                             <div
                               className="h-full bg-brand-500 rounded"
                               style={{ width: `${(amount / maxIncome) * 100}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium w-28 text-right">{formatZAR(amount)}</span>
+                          <span className="text-xs sm:text-sm font-medium w-20 sm:w-28 text-right">{formatZAR(amount)}</span>
                         </div>
                       );
                     })}

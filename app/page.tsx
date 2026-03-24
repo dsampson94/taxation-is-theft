@@ -20,11 +20,11 @@ export default function Home() {
               Upload your bank statements. Our AI finds every legitimate deduction.
               Pay the least tax legally possible — in minutes, not months.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register" className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 text-lg font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Link href="/register" className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
                 Get Started Free
               </Link>
-              <Link href="#how-it-works" className="inline-flex items-center justify-center rounded-lg border-2 border-white/30 px-8 py-4 text-lg font-semibold text-white hover:bg-white/10 transition-colors">
+              <Link href="#how-it-works" className="inline-flex items-center justify-center rounded-lg border-2 border-white/30 px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold text-white hover:bg-white/10 transition-colors">
                 See How It Works
               </Link>
             </div>
@@ -38,21 +38,21 @@ export default function Home() {
       {/* Stats bar */}
       <section className="border-b border-slate-200 bg-white dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-center">
             <div>
-              <div className="text-3xl font-bold text-brand-600">R17,235</div>
+              <div className="text-2xl sm:text-3xl font-bold text-brand-600">R17,235</div>
               <div className="text-sm text-slate-500 mt-1">Primary Tax Rebate</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-brand-600">R95,750</div>
+              <div className="text-2xl sm:text-3xl font-bold text-brand-600">R95,750</div>
               <div className="text-sm text-slate-500 mt-1">Tax-Free Threshold</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-accent-600">18-45%</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent-600">18-45%</div>
               <div className="text-sm text-slate-500 mt-1">Income Tax Range</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-accent-600">100%</div>
+              <div className="text-2xl sm:text-3xl font-bold text-accent-600">100%</div>
               <div className="text-sm text-slate-500 mt-1">Legal & Compliant</div>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             <div className="card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600">
                 <Upload size={28} />
@@ -117,7 +117,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             <div className="card">
               <TrendingDown className="text-brand-600 mb-3" size={24} />
               <h3 className="font-semibold text-lg mb-2">Maximize Deductions</h3>
@@ -174,7 +174,7 @@ export default function Home() {
             Join thousands of South Africans who are taking control of their tax.
             Your first 3 statement analyses are completely free.
           </p>
-          <Link href="/register" className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 text-lg font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
+          <Link href="/register" className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
             Start Saving Now — It&apos;s Free
           </Link>
         </div>
@@ -183,7 +183,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-slate-900 text-slate-400 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-bold text-sm">

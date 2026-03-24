@@ -130,34 +130,34 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden pb-4 space-y-2">
+          <div className="md:hidden pb-4 space-y-1 border-t border-slate-200 dark:border-slate-700 mt-2 pt-2">
             {user ? (
               <>
-                <Link href="/dashboard" className="block py-2 text-sm font-medium text-slate-600" onClick={() => setMobileOpen(false)}>
+                <Link href="/dashboard" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Dashboard
                 </Link>
-                <Link href="/upload" className="block py-2 text-sm font-medium text-slate-600" onClick={() => setMobileOpen(false)}>
+                <Link href="/upload" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Upload Statements
                 </Link>
-                <Link href="/report" className="block py-2 text-sm font-medium text-slate-600" onClick={() => setMobileOpen(false)}>
+                <Link href="/report" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Tax Report
                 </Link>
-                <Link href="/tax-profile" className="block py-2 text-sm font-medium text-slate-600" onClick={() => setMobileOpen(false)}>
+                <Link href="/tax-profile" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Tax Profile
                 </Link>
-                <Link href="/pricing" className="block py-2 text-sm font-medium text-accent-600" onClick={() => setMobileOpen(false)}>
+                <Link href="/pricing" className="block py-2.5 px-2 text-sm font-medium text-accent-600 hover:bg-slate-50 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Buy Credits ({user.credits})
                 </Link>
-                <button onClick={() => { logout(); setMobileOpen(false); }} className="block py-2 text-sm font-medium text-brand-600">
+                <button onClick={() => { logout(); setMobileOpen(false); }} className="block w-full text-left py-2.5 px-2 text-sm font-medium text-brand-600 hover:bg-slate-50 rounded-lg">
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="block py-2 text-sm font-medium text-slate-600" onClick={() => setMobileOpen(false)}>
+                <Link href="/login" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Sign In
                 </Link>
-                <Link href="/register" className="block py-2 text-sm font-medium text-brand-600" onClick={() => setMobileOpen(false)}>
+                <Link href="/register" className="block py-2.5 px-2 text-sm font-medium text-brand-600 hover:bg-slate-50 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Get Started Free
                 </Link>
               </>

@@ -118,30 +118,36 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Welcome back{user.name ? `, ${user.name}` : ''}
-            </h1>
-            <p className="text-slate-500 mt-1">
-              {user.credits} analysis credit{user.credits !== 1 ? 's' : ''} remaining •{' '}
-              <span className="capitalize">{user.planType.toLowerCase()}</span> plan
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <Link href="/tax-profile" className="btn-secondary py-2 px-4 text-sm">
-              <Settings size={16} className="mr-2" />
-              Profile
-            </Link>
-            <Link href="/upload" className="btn-primary py-2 px-4 text-sm">
-              <Upload size={16} className="mr-2" />
-              Upload Statements
-            </Link>
+    <div className="min-h-[calc(100vh-4rem)]">
+      {/* Header */}
+      <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold">
+                Welcome back{user.name ? `, ${user.name}` : ''}
+              </h1>
+              <p className="text-brand-200 mt-1">
+                {user.credits} analysis credit{user.credits !== 1 ? 's' : ''} remaining •{' '}
+                <span className="capitalize">{user.planType.toLowerCase()}</span> plan
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Link href="/tax-profile" className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 transition-colors">
+                <Settings size={16} className="mr-2" />
+                Profile
+              </Link>
+              <Link href="/upload" className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
+                <Upload size={16} className="mr-2" />
+                Upload Statements
+              </Link>
+            </div>
           </div>
         </div>
+      </section>
+
+      <div className="bg-slate-50 dark:bg-slate-950">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Profile CTA */}
         {!user.taxProfileComplete && (
@@ -329,6 +335,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

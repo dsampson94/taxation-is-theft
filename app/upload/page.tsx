@@ -232,16 +232,20 @@ function UploadContent() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+    <div className="min-h-[calc(100vh-4rem)]">
+      <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
             Extract Bank Statement Info
           </h1>
-          <p className="text-slate-500 mt-1">
+          <p className="text-brand-200 text-sm">
             Upload your bank statement PDFs and let AI extract and categorize your transactions
           </p>
         </div>
+      </section>
+
+      <div className="bg-slate-50 dark:bg-slate-950">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Profile nudge */}
         <div className="card mb-6 border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950/20">
@@ -530,6 +534,7 @@ function UploadContent() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

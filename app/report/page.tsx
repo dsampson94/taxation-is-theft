@@ -115,15 +115,16 @@ function ReportContent() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Link href="/dashboard" className="text-slate-400 hover:text-slate-600">
-            <ArrowLeft size={20} />
-          </Link>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Tax Report</h1>
+    <div className="min-h-[calc(100vh-4rem)]">
+      <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Tax Report</h1>
+          <p className="text-brand-200 text-sm">Your AI-generated tax analysis and deduction summary</p>
         </div>
+      </section>
 
+      <div className="bg-slate-50 dark:bg-slate-950">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Year selector */}
         <div className="flex gap-3 mb-8 items-center">
           <select
@@ -302,6 +303,7 @@ function ReportContent() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

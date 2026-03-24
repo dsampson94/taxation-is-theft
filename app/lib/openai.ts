@@ -6,6 +6,10 @@ const openai = new OpenAI({
 
 export default openai;
 
+// Re-export the profile-aware prompt builder as the primary prompt system
+export { buildAnalysisPrompt } from './sa-tax-knowledge';
+
+// Legacy generic prompt — kept as fallback for users without a tax profile
 export const ANALYZE_STATEMENT_PROMPT = `You are a South African tax expert AI assistant. Analyze the following bank statement text and extract all transactions.
 
 For each transaction, determine:
@@ -13,7 +17,7 @@ For each transaction, determine:
 2. description - The transaction description
 3. amount - The amount in ZAR (positive for income, negative for expenses)
 4. type - "INCOME", "EXPENSE", or "TRANSFER"
-5. category - One of: SALARY, FREELANCE, INVESTMENT, RENTAL, OTHER_INCOME, OFFICE, TRAVEL, VEHICLE, EQUIPMENT, PROFESSIONAL, MARKETING, UTILITIES, INSURANCE, BANK, TRAINING, RENT, ENTERTAINMENT, MEDICAL, FOOD, PERSONAL, TRANSFER, OTHER
+5. category - One of: SALARY, FREELANCE, INVESTMENT, RENTAL, OTHER_INCOME, OFFICE, TRAVEL, VEHICLE, EQUIPMENT, PROFESSIONAL, MARKETING, UTILITIES, INSURANCE, BANK, TRAINING, RENT, ENTERTAINMENT, MEDICAL, FOOD, PERSONAL, TRANSFER, DONATION, RETIREMENT, OTHER
 6. isDeductible - boolean: whether this could be a legitimate tax deduction for a {occupation}
 7. deductiblePct - 0-100: what percentage is deductible
 8. confidence - 0-1: your confidence in the categorization
@@ -27,6 +31,7 @@ Important rules:
 - Entertainment is generally NOT deductible in SA
 - Medical expenses get medical tax credits, not deductions
 - Personal living expenses are NEVER deductible
+- Transfers between own accounts are NOT income or expenses
 
 Return a JSON object with this structure:
 {

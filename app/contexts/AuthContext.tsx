@@ -9,6 +9,7 @@ interface User {
   occupation?: string;
   planType: string;
   credits: number;
+  taxProfileComplete?: boolean;
 }
 
 interface AuthContextType {

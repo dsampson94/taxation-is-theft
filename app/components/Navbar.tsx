@@ -62,6 +62,16 @@ export default function Navbar() {
                   Tax Report
                 </Link>
                 <Link
+                  href="/tax-profile"
+                  className={`text-sm font-medium transition-colors ${
+                    pathname === '/tax-profile'
+                      ? 'text-brand-600'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300'
+                  }`}
+                >
+                  Tax Profile
+                </Link>
+                <Link
                   href="/pricing"
                   className={`text-sm font-medium transition-colors ${
                     pathname === '/pricing'
@@ -131,6 +141,9 @@ export default function Navbar() {
                 </Link>
                 <Link href="/report" className="block py-2 text-sm font-medium text-slate-600" onClick={() => setMobileOpen(false)}>
                   Tax Report
+                </Link>
+                <Link href="/tax-profile" className="block py-2 text-sm font-medium text-slate-600" onClick={() => setMobileOpen(false)}>
+                  Tax Profile
                 </Link>
                 <Link href="/pricing" className="block py-2 text-sm font-medium text-accent-600" onClick={() => setMobileOpen(false)}>
                   Buy Credits ({user.credits})

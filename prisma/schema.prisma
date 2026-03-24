@@ -22,6 +22,22 @@ model User {
   dateOfBirth   DateTime?
   entityType    EntityType @default(INDIVIDUAL)
   
+  // Extended tax profile (drives AI analysis)
+  employmentType      String?  // employed, self_employed, commission, both
+  hasMedicalAid       Boolean  @default(false)
+  medicalAidMembers   Int?     // number of people on medical aid
+  monthlyMedicalAidFee Decimal? @db.Decimal(10, 2)
+  hasRetirementAnnuity Boolean @default(false)
+  annualRAContribution Decimal? @db.Decimal(12, 2)
+  worksFromHome       Boolean  @default(false)
+  homeOfficePct       Float?   // % of home used as office
+  usesVehicleForWork  Boolean  @default(false)
+  annualBusinessKm    Int?
+  receivesTravelAllowance Boolean @default(false)
+  makesDonations      Boolean  @default(false)
+  hasOutOfPocketMedical Boolean @default(false)
+  taxProfileComplete  Boolean  @default(false)
+  
   // Plan & credits
   planType      PlanType @default(FREE)
   credits       Int      @default(3)

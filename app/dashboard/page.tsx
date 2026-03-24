@@ -14,6 +14,7 @@ import {
   CreditCard,
   BarChart3,
   Settings,
+  Sparkles,
 } from 'lucide-react';
 
 interface TaxYear {
@@ -42,9 +43,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const [taxYears, setTaxYears] = useState<TaxYear[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showProfile, setShowProfile] = useState(false);
-  const [occupation, setOccupation] = useState('');
-  const [taxNumber, setTaxNumber] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -55,7 +53,6 @@ export default function DashboardPage() {
   useEffect(() => {
     if (user) {
       fetchTaxYears();
-      fetchProfile();
     }
   }, [user]);
 
@@ -71,20 +68,6 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchProfile = async () => {
-    try {
-      const res = await fetch('/api/profile');
-      if (res.ok) {
-        const data = await res.json();
-        setOccupation(data.user.occupation || '');
-        setTaxNumber(data.user.taxNumber || '');
-        if (!data.user.occupation) {
-          setShowProfile(true);
-        }
-      }
-    } catch {}
   };
 
   const createTaxYear = async () => {
@@ -104,22 +87,6 @@ export default function DashboardPage() {
       }
     } catch {
       toast.error('Failed to create tax year');
-    }
-  };
-
-  const saveProfile = async () => {
-    try {
-      const res = await fetch('/api/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ occupation, taxNumber }),
-      });
-      if (res.ok) {
-        toast.success('Profile updated');
-        setShowProfile(false);
-      }
-    } catch {
-      toast.error('Failed to update profile');
     }
   };
 
@@ -146,10 +113,10 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => setShowProfile(!showProfile)} className="btn-secondary py-2 px-4 text-sm">
+            <Link href="/tax-profile" className="btn-secondary py-2 px-4 text-sm">
               <Settings size={16} className="mr-2" />
               Profile
-            </button>
+            </Link>
             <Link href="/upload" className="btn-primary py-2 px-4 text-sm">
               <Upload size={16} className="mr-2" />
               Upload Statements
@@ -157,40 +124,28 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Profile setup card */}
-        {showProfile && (
-          <div className="card mb-8 border-brand-200 bg-brand-50 dark:bg-brand-950/20">
-            <h3 className="font-semibold text-lg mb-4">
-              {occupation ? 'Update Your Profile' : '👋 Complete Your Profile'}
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
-              Your occupation helps the AI find profession-specific deductions.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="label">Occupation / Job Title</label>
-                <input
-                  type="text"
-                  value={occupation}
-                  onChange={e => setOccupation(e.target.value)}
-                  className="input"
-                  placeholder="e.g. Software Engineer, Doctor, Freelancer"
-                />
+        {/* Tax Profile Setup CTA */}
+        {!user.taxProfileComplete && (
+          <div className="card mb-8 border-emerald-200 bg-gradient-to-r from-emerald-50 to-accent-50 dark:from-emerald-950/20 dark:to-accent-950/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <Sparkles className="text-emerald-600" size={20} />
+                  <h3 className="font-semibold text-lg">Complete Your Tax Profile</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  Answer 6 quick questions so our AI knows exactly which deductions to find for your occupation, 
+                  medical aid, retirement annuity, and more. This makes your results <strong>significantly more accurate</strong>.
+                </p>
               </div>
-              <div>
-                <label className="label">SARS Tax Reference Number (optional)</label>
-                <input
-                  type="text"
-                  value={taxNumber}
-                  onChange={e => setTaxNumber(e.target.value)}
-                  className="input"
-                  placeholder="e.g. 0123456789"
-                />
-              </div>
+              <Link
+                href="/tax-profile"
+                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors shrink-0"
+              >
+                <Sparkles size={16} className="mr-2" />
+                Set Up Profile (2 min)
+              </Link>
             </div>
-            <button onClick={saveProfile} className="btn-primary py-2 px-4 text-sm">
-              Save Profile
-            </button>
           </div>
         )}
 

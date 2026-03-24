@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
-import { calculateIncomeTax, formatZAR, type EntityType } from '@/app/lib/tax-rates-za';
+import { calculateIncomeTax, type EntityType } from '@/app/lib/tax-rates-za';
+import { SARS_DEDUCTION_RULES } from '@/app/lib/sa-tax-knowledge';
 
 // GET /api/tax-report?taxYearId=xxx
 export async function GET(request: NextRequest) {
@@ -27,7 +28,14 @@ export async function GET(request: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({ where: { id: authUser.userId } });
-    const entityType = (user?.entityType || 'INDIVIDUAL') as EntityType;
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const entityType = (user.entityType || 'INDIVIDUAL') as EntityType;
+    const age = user.dateOfBirth
+      ? Math.floor((Date.now() - new Date(user.dateOfBirth).getTime()) / 31557600000)
+      : 35;
 
     // Get all transactions for this tax year
     const transactions = await prisma.transaction.findMany({
@@ -47,12 +55,63 @@ export async function GET(request: NextRequest) {
       0
     );
 
-    const taxableIncomeWithoutDeductions = totalIncome;
-    const taxableIncomeWithDeductions = Math.max(0, totalIncome - totalDeductions);
+    // ═══ Profile-Based Deductions & Credits ═══
 
-    const taxWithoutDeductions = calculateIncomeTax(taxableIncomeWithoutDeductions, entityType);
-    const taxWithDeductions = calculateIncomeTax(taxableIncomeWithDeductions, entityType);
-    const taxSaved = taxWithoutDeductions - taxWithDeductions;
+    // Medical tax credits
+    let medicalCredits = 0;
+    let medicalCreditDetails = '';
+    if (user.hasMedicalAid && user.medicalAidMembers) {
+      const rules = SARS_DEDUCTION_RULES.medicalCredits;
+      medicalCredits = rules.calculateAnnualCredit(user.medicalAidMembers);
+      medicalCreditDetails = `${user.medicalAidMembers} member(s) on medical aid`;
+
+      // Additional medical expenses credit
+      if (user.hasOutOfPocketMedical) {
+        const outOfPocketTotal = transactions
+          .filter(t => t.category === 'MEDICAL' && t.type === 'EXPENSE')
+          .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
+
+        if (outOfPocketTotal > 0) {
+          const annualFees = user.monthlyMedicalAidFee ? Number(user.monthlyMedicalAidFee) * 12 : 0;
+          const additionalCredit = rules.calculateAdditionalCredit(outOfPocketTotal, medicalCredits, annualFees, age);
+          medicalCredits += additionalCredit;
+        }
+      }
+    }
+
+    // Retirement annuity deduction
+    let raDeduction = 0;
+    let raDetails = '';
+    if (user.hasRetirementAnnuity && user.annualRAContribution) {
+      const raRules = SARS_DEDUCTION_RULES.retirementAnnuity;
+      const contribution = Number(user.annualRAContribution);
+      raDeduction = raRules.calculation(totalIncome, contribution);
+      raDetails = `RA contribution R${contribution.toLocaleString()} — deductible R${raDeduction.toLocaleString()}`;
+    }
+
+    // Home office deduction
+    let homeOfficeDeduction = 0;
+    let homeOfficeDetails = '';
+    if (user.worksFromHome && user.homeOfficePct) {
+      const homeKeywords = ['rent', 'bond', 'mortgage', 'rates', 'levy', 'electricity', 'water', 'internet', 'fibre', 'security', 'cleaning'];
+      const homeExpenses = transactions.filter(t =>
+        t.type === 'EXPENSE' &&
+        homeKeywords.some(kw => t.description.toLowerCase().includes(kw))
+      );
+      const totalHomeExpenses = homeExpenses.reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
+      homeOfficeDeduction = SARS_DEDUCTION_RULES.homeOffice.calculate(totalHomeExpenses, user.homeOfficePct);
+      homeOfficeDetails = `${user.homeOfficePct}% of R${totalHomeExpenses.toLocaleString()} home expenses`;
+    }
+
+    // Total deductions (transaction-based + profile-based)
+    const allDeductions = totalDeductions + raDeduction + homeOfficeDeduction;
+    const taxableIncomeWithoutDeductions = totalIncome;
+    const taxableIncomeWithDeductions = Math.max(0, totalIncome - allDeductions);
+
+    const taxWithoutDeductions = calculateIncomeTax(taxableIncomeWithoutDeductions, entityType, age);
+    const taxWithDeductions = calculateIncomeTax(taxableIncomeWithDeductions, entityType, age);
+    const taxAfterCredits = Math.max(0, taxWithDeductions - medicalCredits);
+    const taxSaved = taxWithoutDeductions - taxAfterCredits;
 
     // Category breakdown
     const categoryBreakdown: Record<string, { count: number; total: number; deductible: number }> = {};
@@ -78,20 +137,33 @@ export async function GET(request: NextRequest) {
       entityType,
       totalIncome,
       totalExpenses,
-      totalDeductions,
+      totalDeductions: allDeductions,
+      transactionDeductions: totalDeductions,
+      // Profile-based deductions & credits
+      medicalCredits,
+      medicalCreditDetails,
+      raDeduction,
+      raDetails,
+      homeOfficeDeduction,
+      homeOfficeDetails,
+      // Tax calculations
       taxableIncomeWithoutDeductions,
       taxableIncomeWithDeductions,
       taxWithoutDeductions,
-      taxWithDeductions,
+      taxWithDeductions: taxAfterCredits,
       taxSaved,
       effectiveRateWithout: totalIncome > 0 ? (taxWithoutDeductions / totalIncome * 100) : 0,
-      effectiveRateWith: totalIncome > 0 ? (taxWithDeductions / totalIncome * 100) : 0,
+      effectiveRateWith: totalIncome > 0 ? (taxAfterCredits / totalIncome * 100) : 0,
+      // Counts
       transactionCount: transactions.length,
       incomeCount: incomeTransactions.length,
       expenseCount: expenseTransactions.length,
       deductibleCount: deductibleTransactions.length,
+      // Breakdowns
       categoryBreakdown,
       monthlyIncome,
+      // Profile completeness
+      profileComplete: user.taxProfileComplete,
     };
 
     // Update TaxYear totals
@@ -99,10 +171,10 @@ export async function GET(request: NextRequest) {
       where: { id: taxYearId },
       data: {
         totalIncome: totalIncome,
-        totalDeductions: totalDeductions,
+        totalDeductions: allDeductions,
         taxableIncome: taxableIncomeWithDeductions,
         estimatedTax: taxWithoutDeductions,
-        taxWithDeductions: taxWithDeductions,
+        taxWithDeductions: taxAfterCredits,
         taxSavings: taxSaved,
       },
     });

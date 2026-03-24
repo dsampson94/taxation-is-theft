@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
-import openai, { ANALYZE_STATEMENT_PROMPT } from '@/app/lib/openai';
+import openai, { ANALYZE_STATEMENT_PROMPT, buildAnalysisPrompt } from '@/app/lib/openai';
+import { validateAndEnrichAnalysis, type AnalyzedTransaction } from '@/app/lib/deduction-rules';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -29,13 +30,30 @@ export async function POST(request: NextRequest) {
     }
 
     const userOccupation = occupation || user.occupation || 'general taxpayer';
-    const prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);
+
+    // ═══ PASS 1: AI Analysis with profile-aware prompt ═══
+    // If user has completed their tax profile, use the enriched prompt.
+    // Otherwise, fall back to the generic prompt.
+    let prompt: string;
+    if (user.taxProfileComplete) {
+      prompt = buildAnalysisPrompt({
+        occupation: userOccupation,
+        employmentType: user.employmentType || undefined,
+        hasMedicalAid: user.hasMedicalAid,
+        hasRetirementAnnuity: user.hasRetirementAnnuity,
+        worksFromHome: user.worksFromHome,
+        usesVehicleForWork: user.usesVehicleForWork,
+        homeOfficePct: user.homeOfficePct || undefined,
+      });
+    } else {
+      prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);
+    }
 
     // Truncate text if too long for API (keep ~50k chars)
     const truncatedText = text.length > 50000 ? text.substring(0, 50000) + '\n[TRUNCATED]' : text;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [
         { role: 'system', content: prompt },
         { role: 'user', content: `Here is the bank statement text to analyze:\n\n${truncatedText}` },
@@ -55,6 +73,45 @@ export async function POST(request: NextRequest) {
       analysisResult = JSON.parse(resultText);
     } catch {
       return NextResponse.json({ error: 'AI returned invalid JSON' }, { status: 500 });
+    }
+
+    // ═══ PASS 2: Rules Engine Validation ═══
+    // Validate AI output against hard-coded SARS rules.
+    // This catches AI mistakes and adds medical credits, RA deduction, etc.
+    let validationResult = null;
+    if (analysisResult.transactions && Array.isArray(analysisResult.transactions)) {
+      validationResult = validateAndEnrichAnalysis(
+        analysisResult.transactions as AnalyzedTransaction[],
+        {
+          occupation: userOccupation,
+          employmentType: user.employmentType || undefined,
+          entityType: user.entityType || undefined,
+          hasMedicalAid: user.hasMedicalAid,
+          medicalAidMembers: user.medicalAidMembers || undefined,
+          monthlyMedicalAidFee: user.monthlyMedicalAidFee ? Number(user.monthlyMedicalAidFee) : undefined,
+          hasRetirementAnnuity: user.hasRetirementAnnuity,
+          annualRAContribution: user.annualRAContribution ? Number(user.annualRAContribution) : undefined,
+          worksFromHome: user.worksFromHome,
+          homeOfficePct: user.homeOfficePct || undefined,
+          usesVehicleForWork: user.usesVehicleForWork,
+          annualBusinessKm: user.annualBusinessKm || undefined,
+          makesDonations: user.makesDonations,
+          hasOutOfPocketMedical: user.hasOutOfPocketMedical,
+        }
+      );
+
+      // Use validated transactions instead of raw AI output
+      analysisResult.transactions = validationResult.transactions;
+      analysisResult.validation = {
+        medicalCredits: validationResult.medicalCredits,
+        retirementDeduction: validationResult.retirementDeduction,
+        homeOfficeDeduction: validationResult.homeOfficeDeduction,
+        travelDeduction: validationResult.travelDeduction,
+        donationDeduction: validationResult.donationDeduction,
+        summary: validationResult.summary,
+        warnings: validationResult.warnings,
+        tips: validationResult.tips,
+      };
     }
 
     // Deduct credit
@@ -90,11 +147,12 @@ export async function POST(request: NextRequest) {
       analysis: analysisResult,
       creditsRemaining: user.credits - 1,
       tokensUsed: completion.usage?.total_tokens || 0,
+      profileComplete: user.taxProfileComplete,
     });
   } catch (error) {
     console.error('Analysis error:', error);
     return NextResponse.json(
-      { error: 'Analysis failed', message: (error as Error).message },
+      { error: 'Analysis failed' },
       { status: 500 }
     );
   }

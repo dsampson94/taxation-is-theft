@@ -20,6 +20,7 @@ export async function GET() {
         entityType: true,
         planType: true,
         credits: true,
+        taxProfileComplete: true,
       },
     });
 

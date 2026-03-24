@@ -2,6 +2,33 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
 
+const PROFILE_SELECT = {
+  id: true,
+  email: true,
+  name: true,
+  occupation: true,
+  taxNumber: true,
+  idNumber: true,
+  dateOfBirth: true,
+  entityType: true,
+  planType: true,
+  credits: true,
+  employmentType: true,
+  hasMedicalAid: true,
+  medicalAidMembers: true,
+  monthlyMedicalAidFee: true,
+  hasRetirementAnnuity: true,
+  annualRAContribution: true,
+  worksFromHome: true,
+  homeOfficePct: true,
+  usesVehicleForWork: true,
+  annualBusinessKm: true,
+  receivesTravelAllowance: true,
+  makesDonations: true,
+  hasOutOfPocketMedical: true,
+  taxProfileComplete: true,
+};
+
 // GET /api/profile
 export async function GET() {
   try {
@@ -12,18 +39,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: authUser.userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        occupation: true,
-        taxNumber: true,
-        idNumber: true,
-        dateOfBirth: true,
-        entityType: true,
-        planType: true,
-        credits: true,
-      },
+      select: PROFILE_SELECT,
     });
 
     return NextResponse.json({ user });
@@ -41,26 +57,28 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const { name, occupation, taxNumber, entityType } = await request.json();
+    const body = await request.json();
+
+    // Whitelist allowed fields
+    const allowedFields = [
+      'name', 'occupation', 'taxNumber', 'entityType', 'dateOfBirth',
+      'employmentType', 'hasMedicalAid', 'medicalAidMembers', 'monthlyMedicalAidFee',
+      'hasRetirementAnnuity', 'annualRAContribution', 'worksFromHome', 'homeOfficePct',
+      'usesVehicleForWork', 'annualBusinessKm', 'receivesTravelAllowance',
+      'makesDonations', 'hasOutOfPocketMedical', 'taxProfileComplete',
+    ];
+
+    const data: Record<string, unknown> = {};
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        data[field] = body[field];
+      }
+    }
 
     const updated = await prisma.user.update({
       where: { id: authUser.userId },
-      data: {
-        name: name || undefined,
-        occupation: occupation || undefined,
-        taxNumber: taxNumber || undefined,
-        entityType: entityType || undefined,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        occupation: true,
-        taxNumber: true,
-        entityType: true,
-        planType: true,
-        credits: true,
-      },
+      data,
+      select: PROFILE_SELECT,
     });
 
     return NextResponse.json({ user: updated });

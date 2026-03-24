@@ -32,6 +32,7 @@ interface Transaction {
   notes: string | null;
   bankName: string | null;
   userOverride: boolean;
+  flag: string | null;
 }
 
 export default function TransactionsPage() {
@@ -53,7 +54,7 @@ function TransactionsContent() {
   const [taxYears, setTaxYears] = useState<any[]>([]);
   const [selectedTaxYearId, setSelectedTaxYearId] = useState(taxYearIdParam || '');
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'income' | 'expense' | 'deductible'>('all');
+  const [filter, setFilter] = useState<'all' | 'income' | 'expense' | 'deductible' | 'review'>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>({});
 
@@ -128,6 +129,7 @@ function TransactionsContent() {
     if (filter === 'income') return tx.type === 'INCOME';
     if (filter === 'expense') return tx.type === 'EXPENSE';
     if (filter === 'deductible') return tx.isDeductible;
+    if (filter === 'review') return tx.flag === 'REVIEW' || tx.flag === 'LIKELY';
     return true;
   });
 
@@ -159,7 +161,7 @@ function TransactionsContent() {
           </select>
 
           <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {(['all', 'income', 'expense', 'deductible'] as const).map(f => (
+            {(['all', 'income', 'expense', 'deductible', 'review'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
@@ -169,7 +171,7 @@ function TransactionsContent() {
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
                 }`}
               >
-                {f === 'all' ? 'All' : f === 'income' ? 'Income' : f === 'expense' ? 'Expenses' : 'Deductible'}
+                {f === 'all' ? 'All' : f === 'income' ? 'Income' : f === 'expense' ? 'Expenses' : f === 'deductible' ? 'Deductible' : '⚠ Needs Review'}
               </button>
             ))}
           </div>
@@ -229,7 +231,13 @@ function TransactionsContent() {
                       {new Date(tx.date).toLocaleDateString('en-ZA')}
                     </td>
                     <td className="py-2.5 px-3 sm:px-4 max-w-[150px] sm:max-w-[250px] truncate text-xs sm:text-sm" title={tx.description}>
-                      {tx.description}
+                      <div className="flex items-center gap-1.5">
+                        {tx.flag === 'OBVIOUS' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-accent-500" title="Obvious deduction" />}
+                        {tx.flag === 'LIKELY' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-blue-500" title="Likely deduction" />}
+                        {tx.flag === 'REVIEW' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-amber-500" title="Needs review" />}
+                        {tx.flag === 'PERSONAL' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-slate-300" title="Personal expense" />}
+                        <span className="truncate">{tx.description}</span>
+                      </div>
                       {tx.notes && (
                         <div className="text-xs text-slate-400 truncate">{tx.notes}</div>
                       )}

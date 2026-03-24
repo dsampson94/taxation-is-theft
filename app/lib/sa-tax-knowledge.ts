@@ -572,7 +572,8 @@ Return a JSON object:
       "deductiblePct": 0-100,
       "confidence": 0.0-1.0,
       "sarsSection": "Section XX" or null,
-      "notes": "Brief explanation of deductibility reasoning"
+      "notes": "Brief explanation of deductibility reasoning",
+      "flag": "OBVIOUS" | "LIKELY" | "REVIEW" | "PERSONAL" | null
     }
   ],
   "summary": {
@@ -587,7 +588,17 @@ Return a JSON object:
     "missedDeductionWarnings": ["string array of deductions the user SHOULD look for but weren't found in this statement"],
     "actionItems": ["string array of things user should do to maximize deductions"]
   }
-}`;
+}
+
+═══ FLAGGING RULES ═══
+For each transaction, assign a flag:
+- "OBVIOUS": Clearly deductible — professional body fees, RA debit orders, medical aid, business insurance, work equipment matching occupation keywords. High confidence.
+- "LIKELY": Probably deductible — items that match this occupation's common deductions, partial-use items (internet, phone), recurring business-pattern payments. User should confirm.
+- "REVIEW": Uncertain/suspicious — large unusual purchases, ambiguous descriptions, items that COULD be personal or business, anything you're less than 60% confident about. Flag for human review.
+- "PERSONAL": Clearly personal — groceries, entertainment, streaming services, gym, personal clothing, dining out, personal insurance. Not deductible.
+- null: For transfers, salary credits, and other neutral items.
+
+Be thorough: extract EVERY transaction, no matter how many. Do not skip or summarize transactions.`;
 }
 
 // ─── Helper: Match occupation to profile ───────────────────────────────────

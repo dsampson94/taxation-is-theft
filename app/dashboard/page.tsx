@@ -124,27 +124,77 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Tax Profile Setup CTA */}
+        {/* Getting Started / Profile CTA */}
         {!user.taxProfileComplete && (
-          <div className="card mb-8 border-emerald-200 bg-gradient-to-r from-emerald-50 to-accent-50 dark:from-emerald-950/20 dark:to-accent-950/20">
+          <div className="card mb-8 border-brand-200 dark:border-brand-800 bg-gradient-to-r from-brand-50 to-blue-50 dark:from-brand-950/30 dark:to-blue-950/30">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <Sparkles className="text-emerald-600" size={20} />
-                  <h3 className="font-semibold text-lg">Complete Your Tax Profile</h3>
+                  <Sparkles className="text-brand-600" size={20} />
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-white">Complete Your Tax Profile</h3>
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-300">
-                  Answer 6 quick questions so our AI knows exactly which deductions to find for your occupation, 
-                  medical aid, retirement annuity, and more. This makes your results <strong>significantly more accurate</strong>.
+                  Tell us your occupation and tax situation so our AI knows exactly which deductions to find.
+                  This makes results <strong>significantly more accurate</strong>. Takes 2 minutes.
                 </p>
               </div>
               <Link
                 href="/tax-profile"
-                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors shrink-0"
+                className="btn-primary shrink-0"
               >
                 <Sparkles size={16} className="mr-2" />
-                Set Up Profile (2 min)
+                Set Up Profile
               </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Getting Started Stepper (show when no tax years) */}
+        {taxYears.length === 0 && !loading && (
+          <div className="card mb-8">
+            <h2 className="font-semibold text-lg mb-4 text-slate-900 dark:text-white">Getting Started</h2>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${user.taxProfileComplete ? 'bg-accent-100 text-accent-700 dark:bg-accent-900/40' : 'bg-brand-100 text-brand-700 dark:bg-brand-900/40'}`}>
+                  {user.taxProfileComplete ? '✓' : '1'}
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white">Complete your tax profile <span className="text-xs text-slate-400 font-normal">(optional but recommended)</span></p>
+                  <p className="text-sm text-slate-500">Helps AI find profession-specific deductions for you</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/40 text-sm font-bold">2</div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white">Create a tax year &amp; upload your bank statements</p>
+                  <p className="text-sm text-slate-500">PDF statements from your online banking portal work best</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/40 text-sm font-bold">3</div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white">Review flagged transactions</p>
+                  <p className="text-sm text-slate-500">Confirm obvious deductions, review suspicious items, exclude personal expenses</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/40 text-sm font-bold">4</div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white">Generate your tax report</p>
+                  <p className="text-sm text-slate-500">See exactly how much you can save — SARS-compliant calculations</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex gap-3">
+              <button onClick={createTaxYear} className="btn-primary">
+                <Plus size={16} className="mr-2" />
+                Create Tax Year &amp; Start
+              </button>
+              {!user.taxProfileComplete && (
+                <Link href="/tax-profile" className="btn-secondary">
+                  Set Up Profile First
+                </Link>
+              )}
             </div>
           </div>
         )}

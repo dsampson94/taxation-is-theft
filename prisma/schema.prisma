@@ -51,6 +51,7 @@ model User {
   deductions    Deduction[]
   taxReports    TaxReport[]
   payments      Payment[]
+  statements    StatementUpload[]
   
   @@map("users")
 }
@@ -81,6 +82,7 @@ model TaxYear {
   transactions  Transaction[]
   deductions    Deduction[]
   reports       TaxReport[]
+  statements    StatementUpload[]
   
   @@unique([userId, yearLabel])
   @@map("tax_years")
@@ -112,6 +114,9 @@ model Transaction {
   userCategory  String?
   userOverride  Boolean  @default(false)
   notes         String?
+  
+  // Flagging: OBVIOUS, LIKELY, REVIEW, PERSONAL
+  flag          String?
   
   createdAt     DateTime @default(now())
   
@@ -198,6 +203,24 @@ model Payment {
   user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@map("payments")
+}
+
+// ─── Statement Uploads (persistent text copies) ─────────
+model StatementUpload {
+  id          String   @id @default(cuid())
+  userId      String
+  taxYearId   String
+  fileName    String
+  rawText     String   // Full extracted text from PDF
+  pageCount   Int      @default(0)
+  fileSize    Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taxYear     TaxYear @relation(fields: [taxYearId], references: [id])
+  
+  @@map("statement_uploads")
 }
 
 // ─── Enums ──────────────────────────────────────────────

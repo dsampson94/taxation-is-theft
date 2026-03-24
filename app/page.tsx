@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-brand-700 via-brand-800 to-brand-950 text-white">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
           <div className="mx-auto max-w-3xl text-center">
@@ -36,24 +36,24 @@ export default function Home() {
       </section>
 
       {/* Stats bar */}
-      <section className="border-b border-slate-200 bg-white dark:bg-slate-900">
+      <section className="border-b border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-700">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 text-center">
             <div>
               <div className="text-2xl sm:text-3xl font-bold text-brand-600">R17,235</div>
-              <div className="text-sm text-slate-500 mt-1">Primary Tax Rebate</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Primary Tax Rebate</div>
             </div>
             <div>
               <div className="text-2xl sm:text-3xl font-bold text-brand-600">R95,750</div>
-              <div className="text-sm text-slate-500 mt-1">Tax-Free Threshold</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Tax-Free Threshold</div>
             </div>
             <div>
               <div className="text-2xl sm:text-3xl font-bold text-accent-600">18-45%</div>
-              <div className="text-sm text-slate-500 mt-1">Income Tax Range</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Income Tax Range</div>
             </div>
             <div>
               <div className="text-2xl sm:text-3xl font-bold text-accent-600">100%</div>
-              <div className="text-sm text-slate-500 mt-1">Legal & Compliant</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Legal &amp; Compliant</div>
             </div>
           </div>
         </div>
@@ -73,30 +73,30 @@ export default function Home() {
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             <div className="card text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-600">
                 <Upload size={28} />
               </div>
-              <h3 className="text-xl font-semibold mb-2">1. Upload Statements</h3>
+              <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">1. Upload Statements</h3>
               <p className="text-slate-600 dark:text-slate-300">
                 Upload your bank statement PDFs. We support FNB, Standard Bank, Nedbank, Absa, Capitec, and more.
               </p>
             </div>
 
             <div className="card text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-100 text-accent-600">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-900/40 text-accent-600">
                 <Brain size={28} />
               </div>
-              <h3 className="text-xl font-semibold mb-2">2. AI Analyzes</h3>
+              <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">2. AI Analyzes</h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Our AI categorizes every transaction, identifies deductible expenses, and calculates your tax position.
+                Our AI categorizes every transaction, flags deductible expenses, and identifies what needs your review.
               </p>
             </div>
 
             <div className="card text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-600">
                 <FileText size={28} />
               </div>
-              <h3 className="text-xl font-semibold mb-2">3. Get Your Report</h3>
+              <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">3. Get Your Report</h3>
               <p className="text-slate-600 dark:text-slate-300">
                 Download a detailed tax report showing your income, deductions, and exactly how much you could save.
               </p>
@@ -110,7 +110,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">
-              Why Taxation is Theft?
+              Why TIT?
             </h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
               Because you work hard for your money. We make sure SARS only gets what they&apos;re legally owed — not a cent more.
@@ -120,42 +120,42 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             <div className="card">
               <TrendingDown className="text-brand-600 mb-3" size={24} />
-              <h3 className="font-semibold text-lg mb-2">Maximize Deductions</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Maximize Deductions</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 AI identifies deductions you never knew existed — profession-specific, home office, travel, equipment, and more.
               </p>
             </div>
             <div className="card">
               <Zap className="text-accent-600 mb-3" size={24} />
-              <h3 className="font-semibold text-lg mb-2">Minutes, Not Months</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Minutes, Not Months</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 No more spreadsheets or expensive tax consultants. Upload, analyze, done. Your tax sorted in minutes.
               </p>
             </div>
             <div className="card">
               <Shield className="text-brand-600 mb-3" size={24} />
-              <h3 className="font-semibold text-lg mb-2">SARS Compliant</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">SARS Compliant</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 Every deduction references the relevant SARS section. Fully legal, fully compliant, fully documented.
               </p>
             </div>
             <div className="card">
               <Brain className="text-accent-600 mb-3" size={24} />
-              <h3 className="font-semibold text-lg mb-2">Occupation-Smart</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Occupation-Smart</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 Software engineer? Doctor? Freelancer? The AI tailors deductions to your specific profession.
               </p>
             </div>
             <div className="card">
               <FileText className="text-brand-600 mb-3" size={24} />
-              <h3 className="font-semibold text-lg mb-2">Year-on-Year Records</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Year-on-Year Records</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
-                Build your tax history. Come back every year and your data is waiting. Track savings over time.
+                Statements stored securely per tax year. Come back every year and your data is waiting. Track savings over time.
               </p>
             </div>
             <div className="card">
               <Upload className="text-accent-600 mb-3" size={24} />
-              <h3 className="font-semibold text-lg mb-2">All Major Banks</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">All Major Banks</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 Works with FNB, Standard Bank, Nedbank, Absa, Capitec, Investec, Discovery Bank, and more.
               </p>
@@ -165,7 +165,7 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-gradient-to-r from-brand-600 to-brand-800 text-white">
+      <section className="py-20 bg-gradient-to-r from-brand-700 to-brand-900 text-white">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
             Ready to Pay Less Tax?
@@ -186,10 +186,10 @@ export default function Home() {
           <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-bold text-sm">
-                  T
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-black text-xs">
+                  TIT
                 </div>
-                <span className="text-white font-bold">Taxation is Theft</span>
+                <span className="text-white font-bold">TIT</span>
               </div>
               <p className="text-sm">
                 AI-powered tax assistance for South African taxpayers. 
@@ -216,7 +216,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-slate-800 text-center text-sm">
-            © {new Date().getFullYear()} taxationistheft.co.za. All rights reserved.
+            © {new Date().getFullYear()} TIT Tax. All rights reserved.
           </div>
         </div>
       </footer>

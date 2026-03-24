@@ -49,6 +49,7 @@ function UploadContent() {
   const [occupation, setOccupation] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [allAnalyses, setAllAnalyses] = useState<any[]>([]);
+  const [profileComplete, setProfileComplete] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -82,6 +83,7 @@ function UploadContent() {
       if (res.ok) {
         const data = await res.json();
         setOccupation(data.user.occupation || '');
+        setProfileComplete(data.user.taxProfileComplete || false);
       }
     } catch {
       // Profile fetch failure is non-critical
@@ -168,7 +170,7 @@ function UploadContent() {
         const res = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, occupation, taxYearId }),
+          body: JSON.stringify({ text, occupation, taxYearId, fileName: f.file.name, fileSize: f.file.size }),
         });
 
         if (!res.ok) {
@@ -228,6 +230,24 @@ function UploadContent() {
             Upload your bank statement PDFs and let AI find your deductions
           </p>
         </div>
+
+        {/* Profile nudge */}
+        {!profileComplete && (
+          <div className="card mb-6 border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950/20">
+            <div className="flex items-start gap-3">
+              <Brain size={20} className="text-brand-600 mt-0.5 shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                  Want more accurate deductions?
+                </p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  <Link href="/tax-profile" className="text-brand-600 hover:underline font-medium">Complete your tax profile</Link>
+                  {' '}so the AI knows your occupation and tax situation. This is optional but significantly improves results.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tax year selector */}
         <div className="card mb-6">

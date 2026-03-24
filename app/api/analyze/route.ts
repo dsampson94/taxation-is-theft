@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No credits remaining. Please purchase more credits.' }, { status: 403 });
     }
 
-    const { text, occupation, taxYearId } = await request.json();
+    const { text, occupation, taxYearId, fileName, fileSize } = await request.json();
 
     if (!text || text.length < 50) {
       return NextResponse.json({ error: 'Statement text too short or empty' }, { status: 400 });
@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
       prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);
     }
 
-    // Truncate text if too long for API (keep ~50k chars)
-    const truncatedText = text.length > 50000 ? text.substring(0, 50000) + '\n[TRUNCATED]' : text;
+    // Truncate text if too long for API (keep ~100k chars — GPT-4o-mini supports 128k context)
+    const truncatedText = text.length > 100000 ? text.substring(0, 100000) + '\n[TRUNCATED — upload shorter statement periods for best results]' : text;
 
     const completion = await getOpenAI().chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
@@ -125,6 +125,19 @@ export async function POST(request: NextRequest) {
 
     // If taxYearId provided, save transactions to DB
     if (taxYearId && analysisResult.transactions) {
+      // Save statement text as a persistent copy
+      const pageEstimate = Math.max(1, Math.ceil(text.length / 3000));
+      await prisma.statementUpload.create({
+        data: {
+          userId: user.id,
+          taxYearId,
+          fileName: fileName || 'bank-statement.pdf',
+          rawText: text,
+          pageCount: pageEstimate,
+          fileSize: fileSize || text.length,
+        },
+      });
+
       const txData = analysisResult.transactions
         .filter((tx: any) => {
           const d = new Date(tx.date);
@@ -145,6 +158,7 @@ export async function POST(request: NextRequest) {
         accountNumber: analysisResult.summary?.accountNumber || null,
         statementMonth: analysisResult.summary?.statementPeriod || null,
         notes: tx.notes || null,
+        flag: ['OBVIOUS', 'LIKELY', 'REVIEW', 'PERSONAL'].includes(tx.flag) ? tx.flag : null,
       }));
 
       await prisma.transaction.createMany({ data: txData });

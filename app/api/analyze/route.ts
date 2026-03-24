@@ -58,19 +58,19 @@ export async function POST(request: NextRequest) {
       prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);
     }
 
-    // Truncate text if too long for API (keep ~100k chars — GPT-4o-mini supports 128k context)
-    const truncatedText = text.length > 100000 ? text.substring(0, 100000) + '\n[TRUNCATED — upload shorter statement periods for best results]' : text;
+    // Truncate text if too long for API (keep ~50k chars to stay well within timeout)
+    const truncatedText = text.length > 50000 ? text.substring(0, 50000) + '\n[TRUNCATED — upload shorter statement periods for best results]' : text;
 
     const completion = await getOpenAI().chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4o',
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [
         { role: 'system', content: prompt },
         { role: 'user', content: `Here is the bank statement text to analyze:\n\n${truncatedText}` },
       ],
       response_format: { type: 'json_object' },
       temperature: 0.1,
-      max_tokens: 16000,
-    });
+      max_tokens: 8000,
+    }, { timeout: 50000 }); // 50s — leave 10s buffer before Vercel's 60s limit
 
     const resultText = completion.choices[0]?.message?.content;
     if (!resultText) {

@@ -5,7 +5,7 @@ let _openai: OpenAI | null = null;
 export function getOpenAI(): OpenAI {
   if (!_openai) {
     _openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: (process.env.OPENAI_API_KEY || '').trim(),
     });
   }
   return _openai;

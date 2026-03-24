@@ -21,8 +21,8 @@ const PLANS = [
     id: 'starter',
     name: 'Starter',
     credits: 5,
-    price: 49,
-    perCredit: '9.80',
+    price: 69,
+    perCredit: '13.80',
     popular: false,
     icon: Zap,
     color: 'border-slate-200',
@@ -39,8 +39,8 @@ const PLANS = [
     id: 'standard',
     name: 'Standard',
     credits: 15,
-    price: 99,
-    perCredit: '6.60',
+    price: 139,
+    perCredit: '9.27',
     popular: true,
     icon: Crown,
     color: 'border-accent-500 ring-2 ring-accent-500/20',
@@ -59,8 +59,8 @@ const PLANS = [
     id: 'pro',
     name: 'Pro',
     credits: 50,
-    price: 249,
-    perCredit: '4.98',
+    price: 349,
+    perCredit: '6.98',
     popular: false,
     icon: Sparkles,
     color: 'border-slate-200',
@@ -81,8 +81,8 @@ const TAX_SEASON_BUNDLE = {
   id: 'tax-season',
   name: 'Tax Season Bundle',
   credits: 24,
-  price: 149,
-  perCredit: '6.21',
+  price: 199,
+  perCredit: '8.29',
   description: '12 months bank + 12 months credit card — complete tax year in one go',
   features: [
     '24 analyses (covers full tax year)',
@@ -147,7 +147,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Hero - SARS eFiling inspired green theme */}
-      <section className="bg-gradient-to-b from-emerald-800 via-emerald-700 to-emerald-900 text-white py-16">
+      <section className="bg-gradient-to-b from-brand-800 via-brand-700 to-brand-900 text-white py-16">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-6 backdrop-blur-sm">
             <Shield size={16} />
@@ -156,7 +156,7 @@ export default function PricingPage() {
           <h1 className="text-3xl sm:text-5xl font-bold mb-4">
             Simple, Transparent Pricing
           </h1>
-          <p className="text-lg text-emerald-100 max-w-2xl mx-auto mb-2">
+          <p className="text-lg text-brand-100 max-w-2xl mx-auto mb-2">
             Pay per analysis. No subscriptions. No hidden fees.<br />
             Each credit = one bank statement analyzed by AI.
           </p>
@@ -224,13 +224,13 @@ export default function PricingPage() {
           </div>
 
           {/* Tax Season Bundle - special highlight */}
-          <div className="card bg-gradient-to-r from-emerald-50 to-accent-50 dark:from-emerald-950/30 dark:to-accent-950/30 border-emerald-200 dark:border-emerald-800">
+          <div className="card bg-gradient-to-r from-brand-50 to-accent-50 dark:from-brand-950/30 dark:to-accent-950/30 border-brand-200 dark:border-brand-800">
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <FileText className="text-emerald-600" size={24} />
+                  <FileText className="text-brand-600" size={24} />
                   <h3 className="text-xl font-bold">{TAX_SEASON_BUNDLE.name}</h3>
-                  <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                  <span className="bg-brand-100 text-brand-700 text-xs font-bold px-2.5 py-0.5 rounded-full">
                     SAVE 17%
                   </span>
                 </div>
@@ -240,7 +240,7 @@ export default function PricingPage() {
                 <ul className="grid sm:grid-cols-2 gap-2">
                   {TAX_SEASON_BUNDLE.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm">
-                      <Check size={14} className="text-emerald-600 shrink-0" />
+                      <Check size={14} className="text-brand-600 shrink-0" />
                       {feature}
                     </li>
                   ))}
@@ -257,7 +257,7 @@ export default function PricingPage() {
                 <button
                   onClick={() => handlePurchase(TAX_SEASON_BUNDLE.id)}
                   disabled={loading === TAX_SEASON_BUNDLE.id}
-                  className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-8 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
+                  className="inline-flex items-center justify-center rounded-lg bg-brand-600 px-8 py-3 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
                 >
                   {loading === TAX_SEASON_BUNDLE.id ? 'Processing...' : (
                     <>Get the Bundle <ArrowRight size={16} className="ml-2" /></>
@@ -286,17 +286,17 @@ export default function PricingPage() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 text-center">
             <div>
-              <Shield className="mx-auto text-emerald-600 mb-2" size={28} />
+              <Shield className="mx-auto text-brand-600 mb-2" size={28} />
               <h4 className="font-semibold mb-1">Secure Payments</h4>
               <p className="text-sm text-slate-500">PayFast — South Africa&apos;s trusted payment gateway. Card, EFT, SnapScan.</p>
             </div>
             <div>
-              <FileText className="mx-auto text-emerald-600 mb-2" size={28} />
+              <FileText className="mx-auto text-brand-600 mb-2" size={28} />
               <h4 className="font-semibold mb-1">No Subscriptions</h4>
               <p className="text-sm text-slate-500">Buy credits when you need them. They never expire. No recurring charges.</p>
             </div>
             <div>
-              <CreditCard className="mx-auto text-emerald-600 mb-2" size={28} />
+              <CreditCard className="mx-auto text-brand-600 mb-2" size={28} />
               <h4 className="font-semibold mb-1">Money-Back Guarantee</h4>
               <p className="text-sm text-slate-500">Not satisfied? Contact us within 7 days for a full refund. No questions asked.</p>
             </div>

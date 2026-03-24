@@ -6,8 +6,8 @@ export const CREDIT_PLANS = [
     id: 'starter',
     name: 'Starter',
     credits: 5,
-    priceZAR: 49,
-    pricePerCredit: 9.80,
+    priceZAR: 69,
+    pricePerCredit: 13.80,
     popular: false,
     description: 'Try it out',
     features: [
@@ -21,8 +21,8 @@ export const CREDIT_PLANS = [
     id: 'standard',
     name: 'Standard',
     credits: 15,
-    priceZAR: 99,
-    pricePerCredit: 6.60,
+    priceZAR: 139,
+    pricePerCredit: 9.27,
     popular: true,
     description: 'Most popular',
     features: [
@@ -38,8 +38,8 @@ export const CREDIT_PLANS = [
     id: 'pro',
     name: 'Pro',
     credits: 50,
-    priceZAR: 249,
-    pricePerCredit: 4.98,
+    priceZAR: 349,
+    pricePerCredit: 6.98,
     popular: false,
     description: 'Power users',
     features: [
@@ -57,8 +57,8 @@ export const TAX_SEASON_BUNDLE = {
   id: 'tax-season',
   name: 'Tax Season Bundle',
   credits: 24,
-  priceZAR: 149,
-  pricePerCredit: 6.21,
+  priceZAR: 199,
+  pricePerCredit: 8.29,
   description: '12 months of bank statements + credit card — one price',
   features: [
     '24 analyses (12 bank + 12 credit card)',

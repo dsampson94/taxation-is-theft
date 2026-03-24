@@ -395,9 +395,9 @@ function UploadContent() {
 
         {/* Results summary */}
         {allAnalyses.length > 0 && (
-          <div className="card border-accent-200 bg-accent-50 dark:bg-accent-950/20">
+          <div className="card border-brand-200 bg-brand-50 dark:bg-brand-950/20">
             <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-              <CheckCircle className="text-accent-600" size={20} />
+              <CheckCircle className="text-brand-600" size={20} />
               Analysis Complete
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6">
@@ -415,7 +415,7 @@ function UploadContent() {
               </div>
               <div>
                 <div className="text-sm text-slate-500">Deductible</div>
-                <div className="text-lg sm:text-xl font-bold text-accent-600">
+                <div className="text-lg sm:text-xl font-bold text-brand-600">
                   {formatZAR(combinedSummary.totalDeductible)}
                 </div>
               </div>

@@ -161,7 +161,7 @@ function ReportContent() {
           <div className="space-y-6">
             {/* Tax savings highlight */}
             {report.taxSaved > 0 && (
-              <div className="card bg-gradient-to-r from-accent-500 to-accent-600 text-white border-0">
+              <div className="card bg-gradient-to-r from-brand-600 to-brand-700 text-white border-0">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <TrendingDown size={32} className="shrink-0 sm:w-10 sm:h-10" />
                   <div>
@@ -201,41 +201,38 @@ function ReportContent() {
               </div>
             </div>
 
-            {/* Tax comparison */}
+            {/* Tax comparison — visual graph */}
             <div className="card">
-              <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+              <h3 className="font-semibold text-lg mb-6 flex items-center gap-2">
                 <DollarSign size={20} className="text-brand-600" />
                 Tax Comparison
               </h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-500">Tax WITHOUT deductions</span>
-                    <span className="font-medium text-red-600">{formatZAR(report.taxWithoutDeductions)}</span>
-                  </div>
-                  <div className="h-3 bg-red-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-red-500 rounded-full" style={{ width: '100%' }} />
-                  </div>
+              <div className="flex items-end justify-center gap-8 sm:gap-16 mb-6" style={{ height: '200px' }}>
+                {/* Bar: Before deductions */}
+                <div className="flex flex-col items-center gap-2 h-full justify-end">
+                  <span className="text-sm font-semibold text-red-500">{formatZAR(report.taxWithoutDeductions)}</span>
+                  <div
+                    className="w-20 sm:w-28 bg-red-400/80 rounded-t-lg transition-all duration-500"
+                    style={{ height: '100%' }}
+                  />
+                  <span className="text-xs text-slate-500 dark:text-slate-400 text-center">Before<br/>deductions</span>
                 </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-500">Tax WITH deductions</span>
-                    <span className="font-medium text-accent-600">{formatZAR(report.taxWithDeductions)}</span>
-                  </div>
-                  <div className="h-3 bg-accent-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-accent-500 rounded-full"
-                      style={{
-                        width: `${report.taxWithoutDeductions > 0 ? (report.taxWithDeductions / report.taxWithoutDeductions * 100) : 0}%`,
-                      }}
-                    />
-                  </div>
+                {/* Bar: After deductions */}
+                <div className="flex flex-col items-center gap-2 h-full justify-end">
+                  <span className="text-sm font-semibold text-brand-500">{formatZAR(report.taxWithDeductions)}</span>
+                  <div
+                    className="w-20 sm:w-28 bg-brand-500/80 rounded-t-lg transition-all duration-500"
+                    style={{
+                      height: `${report.taxWithoutDeductions > 0 ? Math.max(8, (report.taxWithDeductions / report.taxWithoutDeductions * 100)) : 0}%`,
+                    }}
+                  />
+                  <span className="text-xs text-slate-500 dark:text-slate-400 text-center">After<br/>deductions</span>
                 </div>
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>You Save</span>
-                    <span className="text-accent-600">{formatZAR(report.taxSaved)}</span>
-                  </div>
+              </div>
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex justify-between text-lg font-semibold">
+                  <span>You save</span>
+                  <span className="text-accent-600">{formatZAR(report.taxSaved)}</span>
                 </div>
               </div>
             </div>
@@ -257,7 +254,7 @@ function ReportContent() {
                           <div className="text-xs text-slate-500">{data.count} transactions</div>
                         </div>
                         <div className="text-right">
-                          <div className="font-semibold text-accent-600">{formatZAR(data.deductible)}</div>
+                          <div className="font-semibold text-brand-600">{formatZAR(data.deductible)}</div>
                           <div className="text-xs text-slate-500">of {formatZAR(data.total)}</div>
                         </div>
                       </div>

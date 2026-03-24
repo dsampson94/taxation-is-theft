@@ -23,6 +23,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No credits remaining. Please purchase more credits.' }, { status: 403 });
     }
 
+    // Require profile completion — occupation + employment type at minimum
+    if (!user.taxProfileComplete) {
+      return NextResponse.json(
+        { error: 'Please complete your tax profile before analyzing statements. This ensures accurate results.' },
+        { status: 400 }
+      );
+    }
+
     const { text, occupation, taxYearId, fileName, fileSize } = await request.json();
 
     if (!text || text.length < 50) {
@@ -53,7 +61,7 @@ export async function POST(request: NextRequest) {
     const truncatedText = text.length > 100000 ? text.substring(0, 100000) + '\n[TRUNCATED — upload shorter statement periods for best results]' : text;
 
     const completion = await getOpenAI().chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+      model: process.env.OPENAI_MODEL || 'gpt-4o',
       messages: [
         { role: 'system', content: prompt },
         { role: 'user', content: `Here is the bank statement text to analyze:\n\n${truncatedText}` },
@@ -125,16 +133,17 @@ export async function POST(request: NextRequest) {
 
     // If taxYearId provided, save transactions to DB
     if (taxYearId && analysisResult.transactions) {
-      // Save statement text as a persistent copy
+      // Save upload metadata only — we do NOT store raw bank statement text for privacy.
+      // The text is processed in-memory, transactions are extracted, then the text is discarded.
       const pageEstimate = Math.max(1, Math.ceil(text.length / 3000));
       await prisma.statementUpload.create({
         data: {
           userId: user.id,
           taxYearId,
           fileName: fileName || 'bank-statement.pdf',
-          rawText: text,
           pageCount: pageEstimate,
           fileSize: fileSize || text.length,
+          monthLabel: analysisResult.summary?.statementPeriod || null,
         },
       });
 

@@ -205,15 +205,15 @@ model Payment {
   @@map("payments")
 }
 
-// ─── Statement Uploads (persistent text copies) ─────────
+// ─── Statement Uploads (metadata only — raw text is NOT stored for privacy) ──
 model StatementUpload {
   id          String   @id @default(cuid())
   userId      String
   taxYearId   String
   fileName    String
-  rawText     String   // Full extracted text from PDF
   pageCount   Int      @default(0)
   fileSize    Int      @default(0)
+  monthLabel  String?  // e.g. "2024-03" — which month this statement covers
   
   createdAt   DateTime @default(now())
   

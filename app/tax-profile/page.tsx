@@ -154,16 +154,16 @@ export default function TaxProfilePage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950">
       {/* Header */}
-      <section className="bg-gradient-to-b from-emerald-800 to-emerald-900 text-white py-8">
+      <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-4 backdrop-blur-sm">
             <Sparkles size={16} />
             Personalized Tax Analysis
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Set Up Your Tax Profile</h1>
-          <p className="text-emerald-100 text-sm">
+          <p className="text-brand-200 text-sm">
             Answer these questions so our AI knows exactly which deductions to find for you.
-            This is what makes us better than generic AI.
+            The more we know, the more money we can save you.
           </p>
         </div>
       </section>
@@ -179,11 +179,11 @@ export default function TaxProfilePage() {
                   key={s.id}
                   onClick={() => setStep(i)}
                   className={`flex flex-col items-center gap-1 transition-colors ${
-                    i === step ? 'text-emerald-600' : i < step ? 'text-accent-500' : 'text-slate-300'
+                    i === step ? 'text-brand-600' : i < step ? 'text-brand-500' : 'text-slate-300 dark:text-slate-600'
                   }`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                    i === step ? 'bg-emerald-100 text-emerald-700' : i < step ? 'bg-accent-100 text-accent-700' : 'bg-slate-100 text-slate-400'
+                    i === step ? 'bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300' : i < step ? 'bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400' : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                   }`}>
                     {i < step ? <Check size={14} /> : <Icon size={14} />}
                   </div>
@@ -192,9 +192,9 @@ export default function TaxProfilePage() {
               );
             })}
           </div>
-          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+              className="h-full bg-brand-500 rounded-full transition-all duration-300"
               style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
             />
           </div>
@@ -208,9 +208,15 @@ export default function TaxProfilePage() {
           {step === 0 && (
             <div>
               <h2 className="text-lg font-bold mb-1">What do you do for a living?</h2>
-              <p className="text-sm text-slate-500 mb-6">
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
                 Your occupation determines which specific deductions SARS allows. We have specialized knowledge for each profession.
               </p>
+
+              <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800 mb-6">
+                <p className="text-xs text-brand-700 dark:text-brand-300">
+                  <strong>Why this matters:</strong> A software engineer can claim equipment and home office expenses. A doctor can claim CPD, medical equipment, and practice costs. An estate agent can claim vehicle, marketing, and client entertainment. We tailor everything to YOUR profession.
+                </p>
+              </div>
 
               <div className="mb-4">
                 <label className="label">Occupation / Job Title</label>
@@ -222,7 +228,7 @@ export default function TaxProfilePage() {
                   placeholder="e.g. Software Engineer, Doctor, Estate Agent, Teacher"
                 />
                 {profile.occupation && (
-                  <p className="mt-2 text-sm text-emerald-600">
+                  <p className="mt-2 text-sm text-brand-600 dark:text-brand-400">
                     Matched profile: <strong>{matchedOccupation.label}</strong>
                   </p>
                 )}
@@ -230,6 +236,7 @@ export default function TaxProfilePage() {
 
               <div className="mb-4">
                 <label className="label">Employment Type</label>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">This determines your tax obligations and which deductions you qualify for.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {[
                     { value: 'employed', label: 'Employed (salaried)', desc: 'Receive IRP5 from employer' },
@@ -242,16 +249,24 @@ export default function TaxProfilePage() {
                       onClick={() => update('employmentType', opt.value)}
                       className={`p-3 rounded-lg border text-left transition-colors ${
                         profile.employmentType === opt.value
-                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-brand-500 bg-brand-50 dark:bg-brand-950/30 dark:border-brand-400'
+                          : 'border-slate-200 hover:border-slate-300 dark:border-slate-600 dark:hover:border-slate-500'
                       }`}
                     >
                       <div className="font-medium text-sm">{opt.label}</div>
-                      <div className="text-xs text-slate-500">{opt.desc}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{opt.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
+
+              {(profile.employmentType === 'self_employed' || profile.employmentType === 'commission' || profile.employmentType === 'both') && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-3 border border-amber-200 dark:border-amber-800 mb-4">
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    <strong>Good to know:</strong> Self-employed and commission earners can typically claim MORE deductions than salaried employees — including a portion of home expenses, internet, phone, equipment, and all costs incurred to produce income (Section 11(a)).
+                  </p>
+                </div>
+              )}
 
               <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
@@ -263,6 +278,7 @@ export default function TaxProfilePage() {
                     className="input"
                     placeholder="e.g. 0123456789"
                   />
+                  <p className="text-xs text-slate-400 mt-1">Found on your IRP5 or SARS correspondence</p>
                 </div>
                 <div>
                   <label className="label">Your Age</label>
@@ -274,6 +290,7 @@ export default function TaxProfilePage() {
                     min={18}
                     max={100}
                   />
+                  <p className="text-xs text-slate-400 mt-1">Age affects your tax rebate — over 65s get an additional R9,444 rebate</p>
                 </div>
               </div>
             </div>
@@ -283,9 +300,15 @@ export default function TaxProfilePage() {
           {step === 1 && (
             <div>
               <h2 className="text-lg font-bold mb-1">Medical Aid</h2>
-              <p className="text-sm text-slate-500 mb-6">
-                Medical tax credits can save you <strong>R4,000-R12,000+</strong> per year. Most people don&apos;t claim these correctly.
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                Medical tax credits can save you <strong>R4,000–R12,000+</strong> per year. Most South Africans either don&apos;t claim these or claim them incorrectly.
               </p>
+
+              <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800 mb-6">
+                <p className="text-xs text-brand-700 dark:text-brand-300">
+                  <strong>How it works:</strong> SARS gives you a fixed monthly tax credit per medical aid member — R364 for the first two members, R246 for each additional member. This is subtracted directly from your tax owed, not just your taxable income, making it very valuable.
+                </p>
+              </div>
 
               <div className="mb-6">
                 <label className="label mb-3">Do you belong to a medical aid?</label>
@@ -293,7 +316,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('hasMedicalAid', true)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      profile.hasMedicalAid ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      profile.hasMedicalAid ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     Yes
@@ -301,7 +324,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('hasMedicalAid', false)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      !profile.hasMedicalAid ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      !profile.hasMedicalAid ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     No
@@ -340,12 +363,12 @@ export default function TaxProfilePage() {
 
                   <div className="mb-4">
                     <label className="label mb-3">Do you have significant out-of-pocket medical expenses?</label>
-                    <p className="text-xs text-slate-500 mb-3">Expenses NOT covered by medical aid (gap payments, specialists, dental, optical)</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Expenses NOT covered by medical aid — gap payments, specialists, dental, optical, physio, psychology</p>
                     <div className="flex gap-3">
                       <button
                         onClick={() => update('hasOutOfPocketMedical', true)}
                         className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                          profile.hasOutOfPocketMedical ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                          profile.hasOutOfPocketMedical ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                         }`}
                       >
                         Yes
@@ -353,7 +376,7 @@ export default function TaxProfilePage() {
                       <button
                         onClick={() => update('hasOutOfPocketMedical', false)}
                         className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                          !profile.hasOutOfPocketMedical ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                          !profile.hasOutOfPocketMedical ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                         }`}
                       >
                         No
@@ -362,9 +385,9 @@ export default function TaxProfilePage() {
                   </div>
 
                   {/* Preview credit calculation */}
-                  <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
-                    <div className="text-sm font-medium text-emerald-700 mb-1">Estimated Annual Medical Tax Credit</div>
-                    <div className="text-2xl font-bold text-emerald-600">
+                  <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-4 border border-brand-200 dark:border-brand-800 mb-4">
+                    <div className="text-sm font-medium text-brand-700 dark:text-brand-300 mb-1">Estimated Annual Medical Tax Credit</div>
+                    <div className="text-2xl font-bold text-brand-600">
                       R{(
                         (profile.medicalAidMembers <= 2
                           ? 364 * profile.medicalAidMembers
@@ -372,11 +395,27 @@ export default function TaxProfilePage() {
                         ) * 12
                       ).toLocaleString()}
                     </div>
-                    <p className="text-xs text-emerald-600 mt-1">
+                    <p className="text-xs text-brand-600 dark:text-brand-400 mt-1">
                       R364/month for main member{profile.medicalAidMembers >= 2 ? ' + first dependent' : ''}{profile.medicalAidMembers > 2 ? ` + R246/month × ${profile.medicalAidMembers - 2} additional` : ''}
                     </p>
                   </div>
+
+                  {profile.hasOutOfPocketMedical && (
+                    <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-3 border border-amber-200 dark:border-amber-800">
+                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                        <strong>Keep those receipts:</strong> If your out-of-pocket medical expenses exceed 7.5% of your taxable income (for under-65s), the excess qualifies for an additional medical tax credit. This includes dental work, glasses, specialist visits, chronic medication co-payments, and even over-the-counter medicines prescribed by a doctor.
+                      </p>
+                    </div>
+                  )}
                 </>
+              )}
+
+              {!profile.hasMedicalAid && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-3 border border-amber-200 dark:border-amber-800">
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    <strong>Even without medical aid</strong> — if you have out-of-pocket medical expenses that exceed 7.5% of your taxable income, you may still qualify for additional medical tax credits. Keep records of any medical spending.
+                  </p>
+                </div>
               )}
             </div>
           )}
@@ -385,9 +424,15 @@ export default function TaxProfilePage() {
           {step === 2 && (
             <div>
               <h2 className="text-lg font-bold mb-1">Retirement Annuity (RA)</h2>
-              <p className="text-sm text-slate-500 mb-6">
-                RA contributions are deductible up to <strong>27.5% of your income</strong> (max R350,000/year). This is one of the most powerful legal tax-saving tools.
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                RA contributions are deductible up to <strong>27.5% of your income</strong> (max R350,000/year). This is the single most powerful legal tax-saving tool in South Africa.
               </p>
+
+              <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800 mb-6">
+                <p className="text-xs text-brand-700 dark:text-brand-300">
+                  <strong>Why it&apos;s so effective:</strong> Every rand you put into an RA reduces your taxable income directly. If you&apos;re in the 36% tax bracket, a R10,000 RA contribution saves you R3,600 in tax — AND that money grows tax-free until retirement. It&apos;s a double benefit.
+                </p>
+              </div>
 
               <div className="mb-6">
                 <label className="label mb-3">Do you contribute to a Retirement Annuity?</label>
@@ -395,7 +440,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('hasRetirementAnnuity', true)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      profile.hasRetirementAnnuity ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      profile.hasRetirementAnnuity ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     Yes
@@ -403,7 +448,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('hasRetirementAnnuity', false)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      !profile.hasRetirementAnnuity ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      !profile.hasRetirementAnnuity ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     No
@@ -421,16 +466,16 @@ export default function TaxProfilePage() {
                     className="input"
                     placeholder="e.g. 36000 (R3,000/month × 12)"
                   />
-                  <p className="text-xs text-slate-400 mt-1">Total annual amount, including employer RA contributions if applicable</p>
+                  <p className="text-xs text-slate-400 mt-1">Total annual amount you contribute. This combines with any employer pension/provident fund contributions towards the 27.5% limit.</p>
                 </div>
               )}
 
               {!profile.hasRetirementAnnuity && (
                 <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
-                  <div className="text-sm font-medium text-amber-700 mb-1">Did you know?</div>
-                  <p className="text-sm text-amber-600">
-                    If you earn R500,000/year, contributing R137,500 to an RA would save you approximately <strong>R50,875 in tax</strong> (at 37% marginal rate). 
-                    Providers like Allan Gray, 10X, Sanlam, and Old Mutual offer easy RA accounts.
+                  <div className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-1">Something to consider</div>
+                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                    If you earn R500,000/year, contributing R137,500 to an RA could save you approximately <strong>R50,875 in tax</strong> (at the 37% marginal rate).
+                    Providers like Allan Gray, 10X, Sanlam, and Old Mutual offer easy RA accounts you can set up online. Even R1,000/month makes a meaningful difference.
                   </p>
                 </div>
               )}
@@ -441,9 +486,15 @@ export default function TaxProfilePage() {
           {step === 3 && (
             <div>
               <h2 className="text-lg font-bold mb-1">Home Office</h2>
-              <p className="text-sm text-slate-500 mb-6">
-                If you have a dedicated room used exclusively for work, you can deduct a proportion of home expenses.
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                If you have a dedicated room used regularly and exclusively for work, you can deduct a proportion of your home expenses.
               </p>
+
+              <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800 mb-6">
+                <p className="text-xs text-brand-700 dark:text-brand-300">
+                  <strong>What you can claim:</strong> Rent or bond interest, property rates, electricity, cleaning, internet, home insurance, security, and repairs — all proportional to the percentage of your home used as an office. For example, if your office is 15% of your home, you can claim 15% of these expenses.
+                </p>
+              </div>
 
               <div className="mb-6">
                 <label className="label mb-3">Do you work from home (fully or partially)?</label>
@@ -451,7 +502,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('worksFromHome', true)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      profile.worksFromHome ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      profile.worksFromHome ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     Yes
@@ -459,7 +510,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('worksFromHome', false)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      !profile.worksFromHome ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      !profile.worksFromHome ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     No
@@ -487,10 +538,18 @@ export default function TaxProfilePage() {
 
                   {profile.employmentType === 'employed' && (
                     <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
-                      <div className="text-sm font-medium text-amber-700 mb-1">Important for employees</div>
-                      <p className="text-sm text-amber-600">
-                        SARS requires that your employer specifically requires you to work from home AND the room must be used <strong>exclusively</strong> for work. 
-                        If your employer provides an office but you choose to WFH, this deduction may not apply.
+                      <div className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-1">Important for salaried employees</div>
+                      <p className="text-sm text-amber-600 dark:text-amber-400">
+                        SARS requires that your employer specifically requires you to work from home AND the room must be used <strong>exclusively</strong> for work.
+                        If your employer provides an office but you choose to WFH, this deduction may not apply. Self-employed individuals have more flexibility here.
+                      </p>
+                    </div>
+                  )}
+
+                  {(profile.employmentType === 'self_employed' || profile.employmentType === 'commission') && (
+                    <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800">
+                      <p className="text-xs text-brand-700 dark:text-brand-300">
+                        <strong>Self-employed advantage:</strong> As a self-employed individual, SARS is more lenient about home office claims. You just need a dedicated space used regularly and exclusively for work. No employer instruction required.
                       </p>
                     </div>
                   )}
@@ -502,19 +561,24 @@ export default function TaxProfilePage() {
           {/* Step 4: Vehicle */}
           {step === 4 && (
             <div>
-              <h2 className="text-lg font-bold mb-1">Vehicle & Travel</h2>
-              <p className="text-sm text-slate-500 mb-6">
-                If you use your personal vehicle for work travel (not commuting), you can claim fuel, maintenance, and other vehicle costs.
+              <h2 className="text-lg font-bold mb-1">Vehicle &amp; Travel</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                If you use your personal vehicle for work travel (not commuting to/from the office), you can claim fuel, maintenance, insurance, and other vehicle costs.
               </p>
+
+              <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800 mb-6">
+                <p className="text-xs text-brand-700 dark:text-brand-300">
+                  <strong>What counts as work travel:</strong> Visiting clients, travelling between work sites, attending conferences, meetings at other offices, site inspections. Commuting between home and your regular workplace does NOT count.
+                </p>
+              </div>
 
               <div className="mb-6">
                 <label className="label mb-3">Do you use your personal vehicle for work travel?</label>
-                <p className="text-xs text-slate-500 mb-3">Work travel = visiting clients, travelling between sites, etc. NOT commuting to/from office.</p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => update('usesVehicleForWork', true)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      profile.usesVehicleForWork ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      profile.usesVehicleForWork ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     Yes
@@ -522,7 +586,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('usesVehicleForWork', false)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      !profile.usesVehicleForWork ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      !profile.usesVehicleForWork ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     No
@@ -542,6 +606,7 @@ export default function TaxProfilePage() {
                         className="input"
                         placeholder="e.g. 15000"
                       />
+                      <p className="text-xs text-slate-400 mt-1">Estimate from your logbook or GPS records</p>
                     </div>
                     <div>
                       <label className="label mb-3">Receive a travel allowance?</label>
@@ -549,7 +614,7 @@ export default function TaxProfilePage() {
                         <button
                           onClick={() => update('receivesTravelAllowance', true)}
                           className={`flex-1 p-2 rounded-lg border text-center text-sm font-medium transition-colors ${
-                            profile.receivesTravelAllowance ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                            profile.receivesTravelAllowance ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                           }`}
                         >
                           Yes
@@ -557,7 +622,7 @@ export default function TaxProfilePage() {
                         <button
                           onClick={() => update('receivesTravelAllowance', false)}
                           className={`flex-1 p-2 rounded-lg border text-center text-sm font-medium transition-colors ${
-                            !profile.receivesTravelAllowance ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                            !profile.receivesTravelAllowance ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                           }`}
                         >
                           No
@@ -566,11 +631,17 @@ export default function TaxProfilePage() {
                     </div>
                   </div>
 
-                  <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
-                    <div className="text-sm font-medium text-amber-700 mb-1">Logbook Required</div>
-                    <p className="text-sm text-amber-600">
+                  <div className="bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800 mb-3">
+                    <div className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-1">Logbook is essential</div>
+                    <p className="text-sm text-amber-600 dark:text-amber-400">
                       SARS requires a detailed logbook to claim vehicle expenses. Without one, your entire claim can be denied.
-                      Record: date, destination, purpose, and km for each business trip.
+                      Record: date, destination, purpose, and km for each business trip. Phone apps like <em>TripLog</em> make this easy.
+                    </p>
+                  </div>
+
+                  <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800">
+                    <p className="text-xs text-brand-700 dark:text-brand-300">
+                      <strong>Don&apos;t forget:</strong> Uber/Bolt rides for business meetings, parking at client sites, and toll fees are also deductible business travel expenses. Keep those receipts and e-receipts.
                     </p>
                   </div>
                 </>
@@ -582,18 +653,18 @@ export default function TaxProfilePage() {
           {step === 5 && (
             <div>
               <h2 className="text-lg font-bold mb-1">Other Deductions</h2>
-              <p className="text-sm text-slate-500 mb-6">
-                Additional items that can reduce your tax bill.
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                There are several additional deductions that many taxpayers miss — these can add up to significant savings.
               </p>
 
               <div className="mb-6">
                 <label className="label mb-3">Do you donate to registered charities / PBOs?</label>
-                <p className="text-xs text-slate-500 mb-3">Donations with a Section 18A certificate are deductible up to 10% of taxable income.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Donations with a Section 18A certificate are deductible up to 10% of taxable income. This includes registered charities, churches with PBO status, and qualifying non-profits.</p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => update('makesDonations', true)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      profile.makesDonations ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      profile.makesDonations ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     Yes
@@ -601,7 +672,7 @@ export default function TaxProfilePage() {
                   <button
                     onClick={() => update('makesDonations', false)}
                     className={`flex-1 p-3 rounded-lg border text-center font-medium transition-colors ${
-                      !profile.makesDonations ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200'
+                      !profile.makesDonations ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400' : 'border-slate-200 dark:border-slate-600'
                     }`}
                   >
                     No
@@ -609,8 +680,29 @@ export default function TaxProfilePage() {
                 </div>
               </div>
 
+              {profile.makesDonations && (
+                <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-3 border border-brand-200 dark:border-brand-800 mb-6">
+                  <p className="text-xs text-brand-700 dark:text-brand-300">
+                    <strong>Remember:</strong> Always request a Section 18A certificate from the organisation. Without it, SARS will not accept the deduction. Most registered charities will issue one automatically — just ask.
+                  </p>
+                </div>
+              )}
+
+              <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-4 border border-brand-200 dark:border-brand-800 mb-6">
+                <div className="text-sm font-medium text-brand-700 dark:text-brand-300 mb-2">Other commonly missed deductions</div>
+                <ul className="text-xs text-brand-600 dark:text-brand-400 space-y-1.5">
+                  <li>• <strong>Professional body fees</strong> — SAICA, SACAP, HPCSA, Law Society, Engineering Council, etc. (Section 11(a))</li>
+                  <li>• <strong>Trade union fees</strong> — fully deductible under Section 11(a)</li>
+                  <li>• <strong>Work-related subscriptions</strong> — industry journals, professional software licenses, LinkedIn Premium for job-related use</li>
+                  <li>• <strong>Study &amp; training</strong> — courses directly related to your current occupation (not career changes)</li>
+                  <li>• <strong>Protective clothing &amp; uniforms</strong> — required workwear, safety gear, branded uniforms</li>
+                  <li>• <strong>Bad debts</strong> — for self-employed: invoices that clients never paid</li>
+                </ul>
+              </div>
+
               <div>
                 <label className="label">Entity Type</label>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">This affects your tax rate brackets and filing obligations.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {[
                     { value: 'INDIVIDUAL', label: 'Individual' },
@@ -623,8 +715,8 @@ export default function TaxProfilePage() {
                       onClick={() => update('entityType', opt.value)}
                       className={`p-3 rounded-lg border text-center text-sm font-medium transition-colors ${
                         profile.entityType === opt.value
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/30 dark:text-brand-300 dark:border-brand-400'
+                          : 'border-slate-200 hover:border-slate-300 dark:border-slate-600 dark:hover:border-slate-500'
                       }`}
                     >
                       {opt.label}
@@ -648,7 +740,7 @@ export default function TaxProfilePage() {
                   <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
                     <div className="text-xs text-slate-500">Occupation</div>
                     <div className="font-medium">{profile.occupation || 'Not set'}</div>
-                    <div className="text-xs text-emerald-600">{matchedOccupation.label}</div>
+                    <div className="text-xs text-brand-600 dark:text-brand-400">{matchedOccupation.label}</div>
                   </div>
                   <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
                     <div className="text-xs text-slate-500">Employment</div>
@@ -673,12 +765,12 @@ export default function TaxProfilePage() {
                 </div>
               </div>
 
-              <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800 mb-4">
-                <div className="text-sm font-medium text-emerald-700 mb-2">
+              <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-4 border border-brand-200 dark:border-brand-800 mb-4">
+                <div className="text-sm font-medium text-brand-700 dark:text-brand-300 mb-2">
                   <Sparkles size={16} className="inline mr-1" />
                   Deductions We&apos;ll Look For ({applicableDeductions.length} categories)
                 </div>
-                <ul className="text-sm text-emerald-600 space-y-1">
+                <ul className="text-sm text-brand-600 dark:text-brand-400 space-y-1">
                   {applicableDeductions.slice(0, 10).map((d, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check size={14} className="mt-0.5 shrink-0" />
@@ -686,7 +778,7 @@ export default function TaxProfilePage() {
                     </li>
                   ))}
                   {applicableDeductions.length > 10 && (
-                    <li className="text-emerald-500">+ {applicableDeductions.length - 10} more categories</li>
+                    <li className="text-brand-500">+ {applicableDeductions.length - 10} more categories</li>
                   )}
                 </ul>
               </div>
@@ -717,7 +809,7 @@ export default function TaxProfilePage() {
             {step < STEPS.length - 1 ? (
               <button
                 onClick={() => setStep(step + 1)}
-                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-2 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-600 px-6 py-2 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
               >
                 Next <ArrowRight size={16} className="ml-1" />
               </button>
@@ -725,7 +817,7 @@ export default function TaxProfilePage() {
               <button
                 onClick={saveProfile}
                 disabled={saving}
-                className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-2 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-600 px-6 py-2 text-sm font-semibold text-white hover:bg-brand-700 transition-colors disabled:opacity-50"
               >
                 {saving ? 'Saving...' : (
                   <>

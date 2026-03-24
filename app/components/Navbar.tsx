@@ -34,9 +34,6 @@ export default function Navbar() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white font-black text-base tracking-tight">
               TIT
             </div>
-            <span className="text-lg font-bold text-slate-900 dark:text-white">
-              TIT
-            </span>
           </Link>
 
           {/* Desktop nav */}

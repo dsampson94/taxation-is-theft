@@ -10,18 +10,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
-              <svg width="20" height="14" viewBox="0 0 60 42" className="shrink-0 rounded-sm" role="img" aria-label="South African flag">
-                <rect width="60" height="21" fill="#DE3831"/>
-                <rect y="21" width="60" height="21" fill="#002395"/>
-                <polygon points="0,0 25,21 0,42" fill="#000"/>
-                <polygon points="0,3 22,21 0,39" fill="#FFB612"/>
-                <polygon points="0,6 19,21 0,36" fill="#007A4D"/>
-                <polygon points="19,21 60,14 60,28" fill="#007A4D"/>
-                <polygon points="22,21 60,12 60,14" fill="#FFB612"/>
-                <polygon points="22,21 60,28 60,30" fill="#FFB612"/>
-                <polygon points="25,21 60,10 60,12" fill="#FFF"/>
-                <polygon points="25,21 60,30 60,32" fill="#FFF"/>
-              </svg>
+              <img src="/south-africa-flag-icon.svg" alt="South African flag" width={20} height={14} className="shrink-0 rounded-sm" />
               Built for South African Taxpayers
             </div>
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-6">

@@ -186,7 +186,7 @@ function TransactionsContent() {
             </div>
             <div className="card py-3 px-4">
               <div className="text-xs text-slate-500">Income</div>
-              <div className="font-bold text-accent-600">{formatZAR(summary.totalIncome)}</div>
+              <div className="font-bold text-brand-600">{formatZAR(summary.totalIncome)}</div>
             </div>
             <div className="card py-3 px-4">
               <div className="text-xs text-slate-500">Expenses</div>
@@ -194,7 +194,7 @@ function TransactionsContent() {
             </div>
             <div className="card py-3 px-4">
               <div className="text-xs text-slate-500">Deductible</div>
-              <div className="font-bold text-accent-600">{formatZAR(summary.totalDeductible)}</div>
+              <div className="font-bold text-brand-600">{formatZAR(summary.totalDeductible)}</div>
             </div>
           </div>
         )}
@@ -232,7 +232,7 @@ function TransactionsContent() {
                     </td>
                     <td className="py-2.5 px-3 sm:px-4 max-w-[150px] sm:max-w-[250px] truncate text-xs sm:text-sm" title={tx.description}>
                       <div className="flex items-center gap-1.5">
-                        {tx.flag === 'OBVIOUS' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-accent-500" title="Obvious deduction" />}
+                        {tx.flag === 'OBVIOUS' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-brand-500" title="Obvious deduction" />}
                         {tx.flag === 'LIKELY' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-blue-500" title="Likely deduction" />}
                         {tx.flag === 'REVIEW' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-amber-500" title="Needs review" />}
                         {tx.flag === 'PERSONAL' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-slate-300" title="Personal expense" />}
@@ -243,7 +243,7 @@ function TransactionsContent() {
                       )}
                     </td>
                     <td className={`py-2.5 px-3 sm:px-4 text-right font-medium whitespace-nowrap text-xs sm:text-sm ${
-                      tx.type === 'INCOME' ? 'text-accent-600' : 'text-slate-900 dark:text-slate-100'
+                      tx.type === 'INCOME' ? 'text-brand-600' : 'text-slate-900 dark:text-slate-100'
                     }`}>
                       {tx.type === 'INCOME' ? '+' : '-'}{formatZAR(Math.abs(Number(tx.amount)))}
                     </td>
@@ -283,7 +283,7 @@ function TransactionsContent() {
                           />%
                         </div>
                       ) : tx.isDeductible ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-accent-600">
+                        <span className="inline-flex items-center gap-1 text-xs text-brand-600">
                           <CheckCircle size={14} />
                           {tx.deductiblePct}%
                         </span>
@@ -293,7 +293,7 @@ function TransactionsContent() {
                     </td>
                     <td className="py-2.5 px-3 sm:px-4 text-center">
                       {editingId === tx.id ? (
-                        <button onClick={saveEdit} className="text-accent-600 hover:text-accent-700">
+                        <button onClick={saveEdit} className="text-brand-600 hover:text-brand-700">
                           <Save size={16} />
                         </button>
                       ) : (

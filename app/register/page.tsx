@@ -38,7 +38,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="card">
           <div className="text-center mb-8">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent-100 text-accent-600">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600">
               <UserPlus size={24} />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Create Account</h1>

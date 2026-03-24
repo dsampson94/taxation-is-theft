@@ -93,7 +93,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l border-slate-200 dark:border-slate-700">
                   <Link
                     href="/pricing"
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-600 hover:text-accent-700"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700"
                     title="Buy more credits"
                   >
                     <CreditCard size={14} />
@@ -177,7 +177,7 @@ export default function Navbar() {
                 <Link href="/tax-profile" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Tax Profile
                 </Link>
-                <Link href="/pricing" className="block py-2.5 px-2 text-sm font-medium text-accent-600 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg" onClick={() => setMobileOpen(false)}>
+                <Link href="/pricing" className="block py-2.5 px-2 text-sm font-medium text-brand-600 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Credits ({user.credits})
                 </Link>
                 <button onClick={() => { logout(); setMobileOpen(false); }} className="block w-full text-left py-2.5 px-2 text-sm font-medium text-brand-600 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">

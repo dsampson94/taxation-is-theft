@@ -14,7 +14,7 @@ export default function Home() {
             </div>
             <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-6">
               Stop Overpaying<br />
-              <span className="text-accent-400">Your Tax</span>
+              <span className="text-brand-200">Your Tax</span>
             </h1>
             <p className="text-lg sm:text-xl text-brand-100 mb-10 max-w-2xl mx-auto">
               Upload your bank statements. Our AI finds every legitimate deduction.
@@ -29,7 +29,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="mt-4 text-sm text-brand-200">
-              3 free statement analyses • No credit card required
+              1 free trial analysis • No credit card required
             </p>
           </div>
         </div>
@@ -48,11 +48,11 @@ export default function Home() {
               <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Tax-Free Threshold</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-bold text-accent-600">18-45%</div>
+              <div className="text-2xl sm:text-3xl font-bold text-brand-600">18-45%</div>
               <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Income Tax Range</div>
             </div>
             <div>
-              <div className="text-2xl sm:text-3xl font-bold text-accent-600">100%</div>
+              <div className="text-2xl sm:text-3xl font-bold text-brand-600">100%</div>
               <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">Legal &amp; Compliant</div>
             </div>
           </div>
@@ -83,7 +83,7 @@ export default function Home() {
             </div>
 
             <div className="card text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-900/40 text-accent-600">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-600">
                 <Brain size={28} />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">2. AI Analyzes</h3>
@@ -126,7 +126,7 @@ export default function Home() {
               </p>
             </div>
             <div className="card">
-              <Zap className="text-accent-600 mb-3" size={24} />
+              <Zap className="text-brand-600 mb-3" size={24} />
               <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Minutes, Not Months</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 No more spreadsheets or expensive tax consultants. Upload, analyze, done. Your tax sorted in minutes.
@@ -140,7 +140,7 @@ export default function Home() {
               </p>
             </div>
             <div className="card">
-              <Brain className="text-accent-600 mb-3" size={24} />
+              <Brain className="text-brand-600 mb-3" size={24} />
               <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Occupation-Smart</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 Software engineer? Doctor? Freelancer? The AI tailors deductions to your specific profession.
@@ -148,13 +148,13 @@ export default function Home() {
             </div>
             <div className="card">
               <FileText className="text-brand-600 mb-3" size={24} />
-              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">Year-on-Year Records</h3>
+              <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">SARS Compliant</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
-                Statements stored securely per tax year. Come back every year and your data is waiting. Track savings over time.
+                Every deduction references the relevant SARS section. Fully legal, fully compliant, fully documented.
               </p>
             </div>
             <div className="card">
-              <Upload className="text-accent-600 mb-3" size={24} />
+              <Upload className="text-brand-600 mb-3" size={24} />
               <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">All Major Banks</h3>
               <p className="text-slate-600 dark:text-slate-300 text-sm">
                 Works with FNB, Standard Bank, Nedbank, Absa, Capitec, Investec, Discovery Bank, and more.
@@ -172,7 +172,7 @@ export default function Home() {
           </h2>
           <p className="text-lg text-brand-100 mb-8 max-w-2xl mx-auto">
             Join thousands of South Africans who are taking control of their tax.
-            Your first 3 statement analyses are completely free.
+            Your first analysis is completely free — no credit card needed.
           </p>
           <Link href="/register" className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold text-brand-700 hover:bg-brand-50 transition-colors">
             Start Saving Now — It&apos;s Free

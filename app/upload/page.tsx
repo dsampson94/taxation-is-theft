@@ -14,6 +14,11 @@ import {
   Brain,
   ArrowRight,
   Trash2,
+  Lock,
+  Shield,
+  ChevronDown,
+  ChevronUp,
+  Info,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -50,6 +55,8 @@ function UploadContent() {
   const [analyzing, setAnalyzing] = useState(false);
   const [allAnalyses, setAllAnalyses] = useState<any[]>([]);
   const [profileComplete, setProfileComplete] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -316,6 +323,95 @@ function UploadContent() {
           )}
         </div>
 
+        {/* Instructions & Privacy toggles */}
+        <div className="grid sm:grid-cols-2 gap-4 mb-6">
+          {/* How to use */}
+          <div className="card">
+            <button
+              onClick={() => setShowInstructions(v => !v)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Info size={18} className="text-brand-600" />
+                <span className="font-semibold text-sm text-slate-900 dark:text-white">How to use TIT</span>
+              </div>
+              {showInstructions ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+            </button>
+            {showInstructions && (
+              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-300 space-y-3">
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white mb-1">What you need</p>
+                  <ul className="list-disc ml-4 space-y-1 text-xs">
+                    <li><strong>12 months</strong> of bank statement PDFs (March–February for one tax year)</li>
+                    <li>Download from your bank&apos;s online banking &rarr; Statements &rarr; PDF</li>
+                    <li>Credit card statements too, if you have business expenses on them</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white mb-1">Step by step</p>
+                  <ol className="list-decimal ml-4 space-y-1 text-xs">
+                    <li>Select your tax year above (or create one)</li>
+                    <li>Drag &amp; drop all your PDF statements into the upload area</li>
+                    <li>Click &quot;Analyze All with AI&quot; — each statement uses 1 credit</li>
+                    <li>Review flagged transactions on the Transactions page</li>
+                    <li>Generate your Tax Report to see your total savings</li>
+                  </ol>
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white mb-1">Tips for best results</p>
+                  <ul className="list-disc ml-4 space-y-1 text-xs">
+                    <li>Upload one month per PDF (most banks allow this)</li>
+                    <li>Complete your <Link href="/tax-profile" className="text-brand-600 hover:underline">tax profile</Link> first — it makes AI much more accurate</li>
+                    <li>FNB, Standard Bank, Nedbank, Absa, Capitec, Investec &amp; Discovery Bank all supported</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Privacy & Security */}
+          <div className="card">
+            <button
+              onClick={() => setShowPrivacy(v => !v)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Shield size={18} className="text-brand-600" />
+                <span className="font-semibold text-sm text-slate-900 dark:text-white">Privacy &amp; security</span>
+              </div>
+              {showPrivacy ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+            </button>
+            {showPrivacy && (
+              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 space-y-2">
+                <div className="flex items-start gap-2">
+                  <Lock size={14} className="text-brand-600 mt-0.5 shrink-0" />
+                  <span>Bank statements are <strong>processed in memory only</strong> and never stored on our servers. The PDF is read, transactions are extracted, then the file is discarded.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Lock size={14} className="text-brand-600 mt-0.5 shrink-0" />
+                  <span>Extracted transaction data (descriptions, amounts, dates) is <strong>encrypted at rest with AES-256-GCM</strong> in our database.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Lock size={14} className="text-brand-600 mt-0.5 shrink-0" />
+                  <span>Your <strong>ID number and SARS tax reference</strong> are encrypted — even our team cannot read them in the database.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Lock size={14} className="text-brand-600 mt-0.5 shrink-0" />
+                  <span>All connections use <strong>HTTPS/TLS</strong> encryption in transit.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Lock size={14} className="text-brand-600 mt-0.5 shrink-0" />
+                  <span>Compliant with South Africa&apos;s <strong>POPIA</strong> (Protection of Personal Information Act).</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Lock size={14} className="text-brand-600 mt-0.5 shrink-0" />
+                  <span>We <strong>never sell or share</strong> your data with third parties. Your information is used solely for tax analysis.</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* File list */}
         {files.length > 0 && (
           <div className="card mb-6">
@@ -368,7 +464,7 @@ function UploadContent() {
                       </div>
                     )}
                     {f.status === 'done' && (
-                      <CheckCircle size={16} className="text-accent-500" />
+                      <CheckCircle size={16} className="text-brand-500" />
                     )}
                     {f.status === 'error' && (
                       <div className="flex items-center gap-1">

@@ -184,7 +184,7 @@ function ReportContent() {
               </div>
               <div className="card">
                 <div className="text-sm text-slate-500 mb-1">Total Deductions</div>
-                <div className="text-lg sm:text-xl font-bold text-accent-600">{formatZAR(report.totalDeductions)}</div>
+                <div className="text-lg sm:text-xl font-bold text-brand-600">{formatZAR(report.totalDeductions)}</div>
                 <div className="text-xs text-slate-400">{report.deductibleCount} deductible items</div>
               </div>
               <div className="card">
@@ -232,7 +232,7 @@ function ReportContent() {
               <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>You save</span>
-                  <span className="text-accent-600">{formatZAR(report.taxSaved)}</span>
+                  <span className="text-brand-600">{formatZAR(report.taxSaved)}</span>
                 </div>
               </div>
             </div>

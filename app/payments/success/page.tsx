@@ -16,7 +16,7 @@ export default function PaymentSuccessPage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-50 dark:bg-slate-950">
       <div className="card max-w-md w-full text-center">
-        <CheckCircle className="mx-auto text-accent-500 mb-4" size={64} />
+        <CheckCircle className="mx-auto text-brand-500 mb-4" size={64} />
         <h1 className="text-2xl font-bold mb-2">Payment Successful!</h1>
         <p className="text-slate-500 mb-6">
           Your credits have been added to your account. You&apos;re ready to start saving on your taxes.

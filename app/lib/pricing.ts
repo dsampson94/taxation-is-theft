@@ -1,73 +1,63 @@
-// Credit Plans & Pricing for Taxation is Theft
+// Pricing for TIT Tax — per-statement analysis model
 // PayFast is the go-to SA payment gateway (supports EFT, card, SnapScan, etc.)
+
+// Cost breakdown per analysis (GPT-4o):
+//   Input: ~8,000 tokens × $2.50/1M = $0.02
+//   Output: ~4,000 tokens × $10.00/1M = $0.04
+//   Total: ~$0.06 per analysis (~R1.14 at R19/$)
+// Margin: 96-98% depending on plan
 
 export const CREDIT_PLANS = [
   {
-    id: 'starter',
-    name: 'Starter',
-    credits: 5,
+    id: 'single',
+    name: 'Single Analysis',
+    credits: 1,
     priceZAR: 69,
-    pricePerCredit: 13.80,
+    pricePerCredit: 69,
     popular: false,
-    description: 'Try it out',
+    description: 'Analyze one bank statement',
     features: [
-      '5 statement analyses',
+      '1 statement analysis',
       'AI transaction categorization',
+      'Tax deduction identification',
       'Basic tax report',
-      'Deduction identification',
     ],
   },
   {
-    id: 'standard',
-    name: 'Standard',
-    credits: 15,
-    priceZAR: 139,
-    pricePerCredit: 9.27,
+    id: 'tax-year',
+    name: 'Tax Year Pack',
+    credits: 12,
+    priceZAR: 499,
+    pricePerCredit: 41.58,
     popular: true,
-    description: 'Most popular',
+    description: 'Complete tax year — best value',
     features: [
-      '15 statement analyses',
+      '12 statement analyses',
+      'Full tax year coverage (Mar–Feb)',
       'AI transaction categorization',
-      'Full tax report with savings',
-      'Deduction identification',
+      'Detailed tax report with savings',
       'Category breakdown',
-      'Year-on-year tracking',
+      'SARS-ready deduction list',
     ],
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    credits: 50,
-    priceZAR: 349,
-    pricePerCredit: 6.98,
+    id: 'full-coverage',
+    name: 'Full Coverage',
+    credits: 24,
+    priceZAR: 799,
+    pricePerCredit: 33.29,
     popular: false,
-    description: 'Power users',
+    description: 'Bank + credit card for the year',
     features: [
-      '50 statement analyses',
-      'Everything in Standard',
-      'Multiple bank accounts',
+      '24 statement analyses',
+      'Bank account + credit card coverage',
+      'Everything in Tax Year Pack',
+      'Multiple account support',
+      'Year-on-year comparison',
       'Priority AI processing',
-      'Export to tax practitioner',
-      'Historical comparisons',
     ],
   },
 ] as const;
-
-export const TAX_SEASON_BUNDLE = {
-  id: 'tax-season',
-  name: 'Tax Season Bundle',
-  credits: 24,
-  priceZAR: 199,
-  pricePerCredit: 8.29,
-  description: '12 months of bank statements + credit card — one price',
-  features: [
-    '24 analyses (12 bank + 12 credit card)',
-    'Complete tax year coverage',
-    'Full detailed report',
-    'AI-powered deductions',
-    'SARS-ready documentation',
-  ],
-} as const;
 
 // PayFast config
 export const PAYFAST_CONFIG = {
@@ -82,9 +72,8 @@ export const PAYFAST_CONFIG = {
   },
 };
 
-export type PlanId = typeof CREDIT_PLANS[number]['id'] | typeof TAX_SEASON_BUNDLE['id'];
+export type PlanId = typeof CREDIT_PLANS[number]['id'];
 
 export function getPlanById(id: string) {
-  if (id === TAX_SEASON_BUNDLE.id) return TAX_SEASON_BUNDLE;
   return CREDIT_PLANS.find(p => p.id === id) || null;
 }

@@ -15,6 +15,9 @@ import {
   BarChart3,
   Settings,
   Sparkles,
+  Lock,
+  ChevronDown,
+  Info,
 } from 'lucide-react';
 
 interface TaxYear {
@@ -38,11 +41,27 @@ const formatZAR = (amount: number | null) => {
   }).format(amount);
 };
 
+function getTaxYearOptions() {
+  const now = new Date();
+  const currentMonth = now.getMonth(); // 0-indexed (0=Jan)
+  const currentYear = now.getFullYear();
+  // SA tax year: March–February. If Jan/Feb, the "current" year started the previous calendar year.
+  const latestStartYear = currentMonth >= 2 ? currentYear : currentYear - 1;
+  const years: string[] = [];
+  for (let i = 0; i < 6; i++) {
+    const start = latestStartYear - i;
+    years.push(`${start}/${start + 1}`);
+  }
+  return years;
+}
+
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [taxYears, setTaxYears] = useState<TaxYear[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showYearPicker, setShowYearPicker] = useState(false);
+  const [selectedYear, setSelectedYear] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -70,16 +89,18 @@ export default function DashboardPage() {
     }
   };
 
-  const createTaxYear = async () => {
+  const createTaxYear = async (yearLabel?: string) => {
     try {
       const res = await fetch('/api/tax-years', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}), // Uses current tax year
+        body: JSON.stringify({ yearLabel: yearLabel || undefined }),
       });
       if (res.ok) {
         const data = await res.json();
         toast.success(`Tax year ${data.taxYear.yearLabel} created`);
+        setShowYearPicker(false);
+        setSelectedYear('');
         fetchTaxYears();
       } else {
         const data = await res.json();
@@ -89,6 +110,9 @@ export default function DashboardPage() {
       toast.error('Failed to create tax year');
     }
   };
+
+  const existingLabels = taxYears.map(ty => ty.yearLabel);
+  const availableYears = getTaxYearOptions().filter(y => !existingLabels.includes(y));
 
   if (authLoading || !user) {
     return (
@@ -108,7 +132,7 @@ export default function DashboardPage() {
               Welcome back{user.name ? `, ${user.name}` : ''}
             </h1>
             <p className="text-slate-500 mt-1">
-              {user.credits} analysis credits remaining •{' '}
+              {user.credits} analysis credit{user.credits !== 1 ? 's' : ''} remaining •{' '}
               <span className="capitalize">{user.planType.toLowerCase()}</span> plan
             </p>
           </div>
@@ -124,7 +148,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Getting Started / Profile CTA */}
+        {/* Profile CTA */}
         {!user.taxProfileComplete && (
           <div className="card mb-8 border-brand-200 dark:border-brand-800 bg-gradient-to-r from-brand-50 to-blue-50 dark:from-brand-950/30 dark:to-blue-950/30">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -138,10 +162,7 @@ export default function DashboardPage() {
                   This makes results <strong>significantly more accurate</strong>. Takes 2 minutes.
                 </p>
               </div>
-              <Link
-                href="/tax-profile"
-                className="btn-primary shrink-0"
-              >
+              <Link href="/tax-profile" className="btn-primary shrink-0">
                 <Sparkles size={16} className="mr-2" />
                 Set Up Profile
               </Link>
@@ -149,13 +170,13 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Getting Started Stepper (show when no tax years) */}
+        {/* Getting Started (show when no tax years) */}
         {taxYears.length === 0 && !loading && (
           <div className="card mb-8">
             <h2 className="font-semibold text-lg mb-4 text-slate-900 dark:text-white">Getting Started</h2>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${user.taxProfileComplete ? 'bg-accent-100 text-accent-700 dark:bg-accent-900/40' : 'bg-brand-100 text-brand-700 dark:bg-brand-900/40'}`}>
+                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${user.taxProfileComplete ? 'bg-brand-100 text-brand-700 dark:bg-brand-900/40' : 'bg-brand-100 text-brand-700 dark:bg-brand-900/40'}`}>
                   {user.taxProfileComplete ? '✓' : '1'}
                 </div>
                 <div>
@@ -186,7 +207,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="mt-6 flex gap-3">
-              <button onClick={createTaxYear} className="btn-primary">
+              <button onClick={() => setShowYearPicker(true)} className="btn-primary">
                 <Plus size={16} className="mr-2" />
                 Create Tax Year &amp; Start
               </button>
@@ -210,7 +231,7 @@ export default function DashboardPage() {
             </div>
             <div className="card">
               <div className="text-sm text-slate-500 mb-1">Total Deductions</div>
-              <div className="text-lg sm:text-xl font-bold text-accent-600">
+              <div className="text-lg sm:text-xl font-bold text-brand-600">
                 {formatZAR(taxYears[0]?.totalDeductions ?? 0)}
               </div>
             </div>
@@ -222,7 +243,7 @@ export default function DashboardPage() {
             </div>
             <div className="card">
               <div className="text-sm text-slate-500 mb-1">Tax Saved</div>
-              <div className="text-lg sm:text-xl font-bold text-accent-600">
+              <div className="text-lg sm:text-xl font-bold text-brand-600">
                 {formatZAR(taxYears[0]?.taxSavings ?? 0)}
               </div>
             </div>
@@ -233,11 +254,50 @@ export default function DashboardPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Tax Years</h2>
-            <button onClick={createTaxYear} className="btn-secondary py-2 px-3 text-sm">
+            <button onClick={() => setShowYearPicker(true)} className="btn-secondary py-2 px-3 text-sm">
               <Plus size={16} className="mr-1" />
               New Tax Year
             </button>
           </div>
+
+          {/* Year picker modal */}
+          {showYearPicker && (
+            <div className="card mb-4 border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950/20">
+              <h3 className="font-semibold mb-3 text-slate-900 dark:text-white">Select a tax year to create</h3>
+              <p className="text-xs text-slate-500 mb-3">SA tax years run March to February. Select the year you want to do your taxes for.</p>
+              {availableYears.length === 0 ? (
+                <p className="text-sm text-slate-500">You already have all recent tax years. No more years to add.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {availableYears.map(year => (
+                    <button
+                      key={year}
+                      onClick={() => setSelectedYear(year)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                        selectedYear === year
+                          ? 'bg-brand-600 text-white border-brand-600'
+                          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:border-brand-400 text-slate-700 dark:text-slate-200'
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => createTaxYear(selectedYear || undefined)}
+                  disabled={!selectedYear && availableYears.length > 0}
+                  className="btn-primary py-2 px-4 text-sm"
+                >
+                  Create {selectedYear || 'Tax Year'}
+                </button>
+                <button onClick={() => { setShowYearPicker(false); setSelectedYear(''); }} className="btn-secondary py-2 px-4 text-sm">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           {loading ? (
             <div className="card text-center py-8 text-slate-400">Loading...</div>
@@ -248,9 +308,9 @@ export default function DashboardPage() {
               <p className="text-slate-500 mb-4">
                 Create a tax year to start tracking your income and deductions.
               </p>
-              <button onClick={createTaxYear} className="btn-primary">
+              <button onClick={() => setShowYearPicker(true)} className="btn-primary">
                 <Plus size={16} className="mr-2" />
-                Create Current Tax Year
+                Create Tax Year
               </button>
             </div>
           ) : (
@@ -263,7 +323,7 @@ export default function DashboardPage() {
                       <h3 className="font-semibold text-lg">{ty.yearLabel}</h3>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         ty.status === 'COMPLETED'
-                          ? 'bg-accent-100 text-accent-700'
+                          ? 'bg-brand-100 text-brand-700'
                           : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {ty.status === 'COMPLETED' ? 'Complete' : 'In Progress'}
@@ -303,14 +363,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-8">
           <Link href="/upload" className="card hover:border-brand-300 transition-colors group">
             <Upload className="text-brand-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
             <h3 className="font-semibold mb-1">Upload Bank Statement</h3>
             <p className="text-sm text-slate-500">Upload PDFs and let AI analyze your transactions</p>
           </Link>
-          <Link href="/report" className="card hover:border-accent-300 transition-colors group">
-            <FileText className="text-accent-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
+          <Link href="/report" className="card hover:border-brand-300 transition-colors group">
+            <FileText className="text-brand-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
             <h3 className="font-semibold mb-1">View Tax Report</h3>
             <p className="text-sm text-slate-500">See your tax calculations and potential savings</p>
           </Link>
@@ -319,6 +379,22 @@ export default function DashboardPage() {
             <h3 className="font-semibold mb-1">Review Transactions</h3>
             <p className="text-sm text-slate-500">Review and adjust AI categorizations</p>
           </Link>
+        </div>
+
+        {/* Privacy & Security info */}
+        <div className="card bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <div className="flex items-start gap-3">
+            <Lock size={20} className="text-brand-600 mt-0.5 shrink-0" />
+            <div>
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-white mb-1">Your data is protected</h3>
+              <p className="text-xs text-slate-500">
+                Bank statement PDFs are processed in memory and <strong>never stored</strong>.
+                Only extracted transaction data is kept — encrypted at rest with AES-256.
+                Your ID number and tax reference are encrypted in our database.
+                We comply with South Africa&apos;s POPIA (Protection of Personal Information Act).
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -259,38 +259,18 @@ function UploadContent() {
         {/* Tax year selector */}
         <div className="card mb-6">
           <label className="label">Tax Year</label>
-          <div className="flex gap-3">
-            <select
-              value={taxYearId}
-              onChange={e => setTaxYearId(e.target.value)}
-              className="input flex-1"
-            >
-              <option value="">Select a tax year...</option>
-              {taxYears.map((ty: any) => (
-                <option key={ty.id} value={ty.id}>
-                  {ty.yearLabel}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={async () => {
-                const res = await fetch('/api/tax-years', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({}),
-                });
-                if (res.ok) {
-                  const data = await res.json();
-                  setTaxYearId(data.taxYear.id);
-                  fetchTaxYears();
-                  toast.success(`Created ${data.taxYear.yearLabel}`);
-                }
-              }}
-              className="btn-secondary py-2 px-3 text-sm whitespace-nowrap"
-            >
-              + New Year
-            </button>
-          </div>
+          <select
+            value={taxYearId}
+            onChange={e => setTaxYearId(e.target.value)}
+            className="input w-full"
+          >
+            <option value="">Select a tax year...</option>
+            {taxYears.map((ty: any) => (
+              <option key={ty.id} value={ty.id}>
+                {ty.yearLabel}
+              </option>
+            ))}
+          </select>
           {occupation && (
             <p className="text-xs text-slate-400 mt-2">
               AI will optimize deductions for: <span className="font-medium">{occupation}</span>
@@ -350,7 +330,7 @@ function UploadContent() {
                 <div>
                   <p className="font-medium text-slate-900 dark:text-white mb-1">Step by step</p>
                   <ol className="list-decimal ml-4 space-y-1 text-xs">
-                    <li>Select your tax year above (or create one)</li>
+                    <li>Select your tax year above</li>
                     <li>Drag &amp; drop all your PDF statements into the upload area</li>
                     <li>Click &quot;Analyze All with AI&quot; — each statement uses 1 credit</li>
                     <li>Review flagged transactions on the Transactions page</li>

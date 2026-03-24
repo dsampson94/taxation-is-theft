@@ -132,7 +132,26 @@ export async function POST(request: NextRequest) {
     });
 
     // If taxYearId provided, save transactions to DB
+    let replacedMonth = false;
     if (taxYearId && analysisResult.transactions) {
+      const monthLabel = analysisResult.summary?.statementPeriod || null;
+
+      // Duplicate month detection: if the same month was already uploaded for this tax year,
+      // replace the old data so users don't accidentally waste credits on duplicates
+      if (monthLabel) {
+        const existingUpload = await prisma.statementUpload.findFirst({
+          where: { userId: user.id, taxYearId, monthLabel },
+        });
+        if (existingUpload) {
+          // Delete old transactions for this month and the old upload record
+          await prisma.transaction.deleteMany({
+            where: { userId: user.id, taxYearId, statementMonth: monthLabel },
+          });
+          await prisma.statementUpload.delete({ where: { id: existingUpload.id } });
+          replacedMonth = true;
+        }
+      }
+
       // Save upload metadata only — we do NOT store raw bank statement text for privacy.
       // The text is processed in-memory, transactions are extracted, then the text is discarded.
       const pageEstimate = Math.max(1, Math.ceil(text.length / 3000));
@@ -179,6 +198,7 @@ export async function POST(request: NextRequest) {
       creditsRemaining: user.credits - 1,
       tokensUsed: completion.usage?.total_tokens || 0,
       profileComplete: user.taxProfileComplete,
+      replacedMonth: replacedMonth,
     });
   } catch (error) {
     console.error('Analysis error:', error);

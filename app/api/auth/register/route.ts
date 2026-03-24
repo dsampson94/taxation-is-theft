@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/db';
 import { hashPassword, signToken } from '@/app/lib/auth';
+import { getRecentTaxYearLabels, ZA_TAX_YEAR } from '@/app/lib/tax-rates-za';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +27,21 @@ export async function POST(request: NextRequest) {
         passwordHash,
         name: name || null,
       },
+    });
+
+    // Auto-create recent tax years (current + 2 previous)
+    const labels = getRecentTaxYearLabels(3);
+    await prisma.taxYear.createMany({
+      data: labels.map(label => {
+        const [startYearStr, endYearStr] = label.split('/');
+        return {
+          userId: user.id,
+          yearLabel: label,
+          startDate: new Date(parseInt(startYearStr), ZA_TAX_YEAR.START_MONTH - 1, ZA_TAX_YEAR.START_DAY),
+          endDate: new Date(parseInt(endYearStr), ZA_TAX_YEAR.END_MONTH - 1, ZA_TAX_YEAR.END_DAY),
+        };
+      }),
+      skipDuplicates: true,
     });
 
     const token = signToken({ userId: user.id, email: user.email });

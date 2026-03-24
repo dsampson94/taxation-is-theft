@@ -135,6 +135,20 @@ export const getCurrentTaxYear = (): { start: Date; end: Date; label: string } =
   };
 };
 
+// Returns labels for the current tax year + previous N years (default 2, so 3 total)
+export const getRecentTaxYearLabels = (count = 3): string[] => {
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+  const latestStartYear = currentMonth >= ZA_TAX_YEAR.START_MONTH ? currentYear : currentYear - 1;
+  const labels: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const start = latestStartYear - i;
+    labels.push(`${start}/${start + 1}`);
+  }
+  return labels;
+};
+
 export const formatZAR = (amount: number): string => {
   return new Intl.NumberFormat('en-ZA', {
     style: 'currency',

@@ -170,56 +170,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Getting Started (show when no tax years) */}
-        {taxYears.length === 0 && !loading && (
-          <div className="card mb-8">
-            <h2 className="font-semibold text-lg mb-4 text-slate-900 dark:text-white">Getting Started</h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${user.taxProfileComplete ? 'bg-brand-100 text-brand-700 dark:bg-brand-900/40' : 'bg-brand-100 text-brand-700 dark:bg-brand-900/40'}`}>
-                  {user.taxProfileComplete ? '✓' : '1'}
-                </div>
-                <div>
-                  <p className="font-medium text-slate-900 dark:text-white">Complete your tax profile <span className="text-xs text-slate-400 font-normal">(optional but recommended)</span></p>
-                  <p className="text-sm text-slate-500">Helps AI find profession-specific deductions for you</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/40 text-sm font-bold">2</div>
-                <div>
-                  <p className="font-medium text-slate-900 dark:text-white">Create a tax year &amp; upload your bank statements</p>
-                  <p className="text-sm text-slate-500">PDF statements from your online banking portal work best</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/40 text-sm font-bold">3</div>
-                <div>
-                  <p className="font-medium text-slate-900 dark:text-white">Review flagged transactions</p>
-                  <p className="text-sm text-slate-500">Confirm obvious deductions, review suspicious items, exclude personal expenses</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/40 text-sm font-bold">4</div>
-                <div>
-                  <p className="font-medium text-slate-900 dark:text-white">Generate your tax report</p>
-                  <p className="text-sm text-slate-500">See exactly how much you can save — SARS-compliant calculations</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 flex gap-3">
-              <button onClick={() => setShowYearPicker(true)} className="btn-primary">
-                <Plus size={16} className="mr-2" />
-                Create Tax Year &amp; Start
-              </button>
-              {!user.taxProfileComplete && (
-                <Link href="/tax-profile" className="btn-secondary">
-                  Set Up Profile First
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Stats cards */}
         {taxYears.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
@@ -256,17 +206,17 @@ export default function DashboardPage() {
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Tax Years</h2>
             <button onClick={() => setShowYearPicker(true)} className="btn-secondary py-2 px-3 text-sm">
               <Plus size={16} className="mr-1" />
-              New Tax Year
+              Add Older Year
             </button>
           </div>
 
           {/* Year picker modal */}
           {showYearPicker && (
             <div className="card mb-4 border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950/20">
-              <h3 className="font-semibold mb-3 text-slate-900 dark:text-white">Select a tax year to create</h3>
-              <p className="text-xs text-slate-500 mb-3">SA tax years run March to February. Select the year you want to do your taxes for.</p>
+              <h3 className="font-semibold mb-3 text-slate-900 dark:text-white">Add an older tax year</h3>
+              <p className="text-xs text-slate-500 mb-3">SA tax years run March to February. Your recent years were created automatically.</p>
               {availableYears.length === 0 ? (
-                <p className="text-sm text-slate-500">You already have all recent tax years. No more years to add.</p>
+              <p className="text-sm text-slate-500">You already have all recent tax years.</p>
               ) : (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {availableYears.map(year => (
@@ -301,18 +251,6 @@ export default function DashboardPage() {
 
           {loading ? (
             <div className="card text-center py-8 text-slate-400">Loading...</div>
-          ) : taxYears.length === 0 ? (
-            <div className="card text-center py-12">
-              <Calendar className="mx-auto text-slate-300 mb-4" size={48} />
-              <h3 className="text-lg font-semibold mb-2">No Tax Years Yet</h3>
-              <p className="text-slate-500 mb-4">
-                Create a tax year to start tracking your income and deductions.
-              </p>
-              <button onClick={() => setShowYearPicker(true)} className="btn-primary">
-                <Plus size={16} className="mr-2" />
-                Create Tax Year
-              </button>
-            </div>
           ) : (
             <div className="grid gap-4">
               {taxYears.map(ty => (

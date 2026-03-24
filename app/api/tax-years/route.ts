@@ -1,7 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
-import { getCurrentTaxYear } from '@/app/lib/tax-rates-za';
+import { getCurrentTaxYear, getRecentTaxYearLabels, ZA_TAX_YEAR } from '@/app/lib/tax-rates-za';
+
+// Auto-seed recent tax years for a user who has none yet
+async function seedTaxYearsIfNeeded(userId: string) {
+  const count = await prisma.taxYear.count({ where: { userId } });
+  if (count > 0) return;
+
+  const labels = getRecentTaxYearLabels(3);
+  await prisma.taxYear.createMany({
+    data: labels.map(label => {
+      const [startYearStr, endYearStr] = label.split('/');
+      return {
+        userId,
+        yearLabel: label,
+        startDate: new Date(parseInt(startYearStr), ZA_TAX_YEAR.START_MONTH - 1, ZA_TAX_YEAR.START_DAY),
+        endDate: new Date(parseInt(endYearStr), ZA_TAX_YEAR.END_MONTH - 1, ZA_TAX_YEAR.END_DAY),
+      };
+    }),
+    skipDuplicates: true,
+  });
+}
 
 // GET /api/tax-years - List user's tax years
 export async function GET() {
@@ -10,6 +30,9 @@ export async function GET() {
     if (!authUser) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
+
+    // Auto-seed for existing users who registered before auto-creation
+    await seedTaxYearsIfNeeded(authUser.userId);
 
     const taxYears = await prisma.taxYear.findMany({
       where: { userId: authUser.userId },

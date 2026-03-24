@@ -235,11 +235,16 @@ function UploadContent() {
     <div className="min-h-[calc(100vh-4rem)]">
       <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-4 backdrop-blur-sm">
+            <Upload size={16} />
+            Statement Upload
+          </div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">
             Extract Bank Statement Info
           </h1>
           <p className="text-brand-200 text-sm">
-            Upload your bank statement PDFs and let AI extract and categorize your transactions
+            Upload your bank statement PDFs and let AI extract and categorize your transactions.
+            Your files are processed in memory and never stored.
           </p>
         </div>
       </section>

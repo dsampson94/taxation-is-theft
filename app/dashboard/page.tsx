@@ -122,17 +122,20 @@ export default function DashboardPage() {
       {/* Header */}
       <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">
-                Welcome back{user.name ? `, ${user.name}` : ''}
-              </h1>
-              <p className="text-brand-200 mt-1">
-                {user.credits} analysis credit{user.credits !== 1 ? 's' : ''} remaining •{' '}
-                <span className="capitalize">{user.planType.toLowerCase()}</span> plan
-              </p>
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-4 backdrop-blur-sm">
+              <Sparkles size={16} />
+              Your Tax Dashboard
             </div>
-            <div className="flex gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+              Welcome back{user.name ? `, ${user.name}` : ''}
+            </h1>
+            <p className="text-brand-200 text-sm">
+              {user.credits} analysis credit{user.credits !== 1 ? 's' : ''} remaining •{' '}
+              <span className="capitalize">{user.planType.toLowerCase()}</span> plan
+            </p>
+          </div>
+          <div className="flex justify-center gap-3">
               <Link href="/tax-profile" className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 transition-colors">
                 <Settings size={16} className="mr-2" />
                 Profile
@@ -141,7 +144,6 @@ export default function DashboardPage() {
                 <Upload size={16} className="mr-2" />
                 Upload Statements
               </Link>
-            </div>
           </div>
         </div>
       </section>

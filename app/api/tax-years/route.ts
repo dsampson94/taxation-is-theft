@@ -3,12 +3,12 @@ import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
 import { getCurrentTaxYear, getRecentTaxYearLabels, ZA_TAX_YEAR } from '@/app/lib/tax-rates-za';
 
-// Auto-seed recent tax years for a user who has none yet
+// Auto-seed recent tax years — fills in any missing years
 async function seedTaxYearsIfNeeded(userId: string) {
-  const count = await prisma.taxYear.count({ where: { userId } });
-  if (count > 0) return;
-
-  const labels = getRecentTaxYearLabels(3);
+  const existing = await prisma.taxYear.findMany({ where: { userId }, select: { yearLabel: true } });
+  const existingLabels = new Set(existing.map(t => t.yearLabel));
+  const labels = getRecentTaxYearLabels(7).filter(l => !existingLabels.has(l));
+  if (labels.length === 0) return;
   await prisma.taxYear.createMany({
     data: labels.map(label => {
       const [startYearStr, endYearStr] = label.split('/');

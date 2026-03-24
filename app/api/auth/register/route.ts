@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Auto-create recent tax years (current + 2 previous)
-    const labels = getRecentTaxYearLabels(3);
+    // Auto-create recent tax years (current + 6 previous)
+    const labels = getRecentTaxYearLabels(7);
     await prisma.taxYear.createMany({
       data: labels.map(label => {
         const [startYearStr, endYearStr] = label.split('/');

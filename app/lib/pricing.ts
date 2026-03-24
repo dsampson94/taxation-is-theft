@@ -12,8 +12,8 @@ export const CREDIT_PLANS = [
     id: 'single',
     name: 'Single Analysis',
     credits: 1,
-    priceZAR: 69,
-    pricePerCredit: 69,
+    priceZAR: 49,
+    pricePerCredit: 49,
     popular: false,
     description: 'Analyze one bank statement',
     features: [
@@ -27,8 +27,8 @@ export const CREDIT_PLANS = [
     id: 'tax-year',
     name: 'Tax Year Pack',
     credits: 12,
-    priceZAR: 499,
-    pricePerCredit: 41.58,
+    priceZAR: 375,
+    pricePerCredit: 31.25,
     popular: true,
     description: 'Complete tax year — best value',
     features: [
@@ -44,8 +44,8 @@ export const CREDIT_PLANS = [
     id: 'full-coverage',
     name: 'Full Coverage',
     credits: 24,
-    priceZAR: 799,
-    pricePerCredit: 33.29,
+    priceZAR: 599,
+    pricePerCredit: 24.96,
     popular: false,
     description: 'Bank + credit card for the year',
     features: [

@@ -37,59 +37,34 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-1">
             {user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  className={`text-sm font-medium transition-colors ${
-                    pathname === '/dashboard'
-                      ? 'text-brand-600'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
-                  }`}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/upload"
-                  className={`text-sm font-medium transition-colors ${
-                    pathname === '/upload'
-                      ? 'text-brand-600'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
-                  }`}
-                >
-                  Upload
-                </Link>
-                <Link
-                  href="/report"
-                  className={`text-sm font-medium transition-colors ${
-                    pathname === '/report'
-                      ? 'text-brand-600'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
-                  }`}
-                >
-                  Tax Report
-                </Link>
-                <Link
-                  href="/tax-profile"
-                  className={`text-sm font-medium transition-colors ${
-                    pathname === '/tax-profile'
-                      ? 'text-brand-600'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
-                  }`}
-                >
-                  Profile
-                </Link>
-                <Link
-                  href="/pricing"
-                  className={`text-sm font-medium transition-colors ${
-                    pathname === '/pricing'
-                      ? 'text-brand-600'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
-                  }`}
-                >
-                  Credits
-                </Link>
+                {[
+                  { label: 'Dashboard', href: '/dashboard' },
+                  { label: 'Profile', href: '/tax-profile' },
+                  { label: 'Upload', href: '/upload' },
+                  { label: 'Transactions', href: '/transactions' },
+                  { label: 'Report', href: '/report' },
+                ].map((item, i) => (
+                  <div key={item.label} className="flex items-center">
+                    {i > 0 && (
+                      <svg className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 mx-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
+                    <Link
+                      href={item.href}
+                      className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
+                        pathname === item.href
+                          ? 'text-brand-600 bg-brand-50 dark:bg-brand-950/30 dark:text-brand-400'
+                          : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </div>
+                ))}
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l border-slate-200 dark:border-slate-700">
                   <Link
                     href="/pricing"
@@ -159,46 +134,6 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Process flow breadcrumb */}
-        {user && !isLanding && (
-          <div className="flex items-center gap-0.5 pb-2 -mt-1 overflow-x-auto">
-            {[
-              { label: 'Profile', href: '/tax-profile', done: !!user.taxProfileComplete },
-              { label: 'Upload', href: '/upload', done: false },
-              { label: 'Transactions', href: '/transactions', done: false },
-              { label: 'Report', href: '/report', done: false },
-            ].map((s, i) => {
-              const active = pathname === s.href;
-              return (
-                <div key={s.label} className="flex items-center shrink-0">
-                  {i > 0 && (
-                    <svg className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 mx-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  )}
-                  <Link
-                    href={s.href}
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs whitespace-nowrap transition-colors ${
-                      active
-                        ? 'text-brand-600 font-semibold bg-brand-50 dark:bg-brand-950/30 dark:text-brand-400'
-                        : s.done
-                          ? 'text-brand-500 dark:text-brand-400'
-                          : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300'
-                    }`}
-                  >
-                    {s.done && !active && (
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                    {s.label}
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        )}
 
         {/* Mobile menu */}
         {mobileOpen && (

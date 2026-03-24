@@ -90,7 +90,12 @@ function UploadContent() {
       if (res.ok) {
         const data = await res.json();
         setOccupation(data.user.occupation || '');
-        setProfileComplete(data.user.taxProfileComplete || false);
+        const isComplete = data.user.taxProfileComplete || false;
+        setProfileComplete(isComplete);
+        if (!isComplete) {
+          toast('Complete your tax profile first so AI knows what to look for', { icon: '\uD83D\uDCCB', duration: 5000 });
+          router.push('/tax-profile');
+        }
       }
     } catch {
       // Profile fetch failure is non-critical
@@ -231,10 +236,10 @@ function UploadContent() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Upload Bank Statements
+            Extract Bank Statement Info
           </h1>
           <p className="text-slate-500 mt-1">
-            Upload your bank statement PDFs and let AI find your deductions
+            Upload your bank statement PDFs and let AI extract and categorize your transactions
           </p>
         </div>
 

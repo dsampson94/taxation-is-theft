@@ -26,6 +26,7 @@ const PROFILE_SELECT = {
   receivesTravelAllowance: true,
   makesDonations: true,
   hasOutOfPocketMedical: true,
+  taxNotes: true,
   taxProfileComplete: true,
 };
 
@@ -65,7 +66,7 @@ export async function PATCH(request: NextRequest) {
       'employmentType', 'hasMedicalAid', 'medicalAidMembers', 'monthlyMedicalAidFee',
       'hasRetirementAnnuity', 'annualRAContribution', 'worksFromHome', 'homeOfficePct',
       'usesVehicleForWork', 'annualBusinessKm', 'receivesTravelAllowance',
-      'makesDonations', 'hasOutOfPocketMedical', 'taxProfileComplete',
+      'makesDonations', 'hasOutOfPocketMedical', 'taxNotes', 'taxProfileComplete',
     ];
 
     // Convert age (number) to dateOfBirth (Date) if provided
@@ -78,6 +79,22 @@ export async function PATCH(request: NextRequest) {
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
         data[field] = body[field];
+      }
+    }
+
+    // Validate required fields when marking profile as complete
+    if (data.taxProfileComplete === true) {
+      const current = await prisma.user.findUnique({
+        where: { id: authUser.userId },
+        select: { occupation: true, employmentType: true },
+      });
+      const occupation = (data.occupation as string) || current?.occupation;
+      const employmentType = (data.employmentType as string) || current?.employmentType;
+      if (!occupation || !occupation.trim()) {
+        return NextResponse.json({ error: 'Occupation is required to complete your profile' }, { status: 400 });
+      }
+      if (!employmentType) {
+        return NextResponse.json({ error: 'Employment type is required to complete your profile' }, { status: 400 });
       }
     }
 

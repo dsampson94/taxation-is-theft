@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
         worksFromHome: user.worksFromHome,
         usesVehicleForWork: user.usesVehicleForWork,
         homeOfficePct: user.homeOfficePct || undefined,
+        taxNotes: user.taxNotes || undefined,
       });
     } else {
       prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);

@@ -36,6 +36,7 @@ model User {
   receivesTravelAllowance Boolean @default(false)
   makesDonations      Boolean  @default(false)
   hasOutOfPocketMedical Boolean @default(false)
+  taxNotes            String?  // User's additional context/testimony for AI
   taxProfileComplete  Boolean  @default(false)
   
   // Plan & credits

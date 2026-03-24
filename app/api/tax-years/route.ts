@@ -49,7 +49,7 @@ export async function GET() {
   }
 }
 
-// POST /api/tax-years - Create a new tax year
+// POST /api/tax-years - Create a tax year
 export async function POST(request: NextRequest) {
   try {
     const authUser = await getAuthUser();
@@ -60,13 +60,12 @@ export async function POST(request: NextRequest) {
     const { yearLabel } = await request.json();
     const label = yearLabel || getCurrentTaxYear().label;
 
-    // Parse year label to get dates
     const [startYearStr, endYearStr] = label.split('/');
     const startYear = parseInt(startYearStr);
     const endYear = parseInt(endYearStr);
 
-    if (isNaN(startYear) || isNaN(endYear)) {
-      return NextResponse.json({ error: 'Invalid year format. Use YYYY/YYYY' }, { status: 400 });
+    if (isNaN(startYear) || isNaN(endYear) || startYear < 2000 || startYear > 2030) {
+      return NextResponse.json({ error: 'Invalid year format. Use YYYY/YYYY (2000-2030)' }, { status: 400 });
     }
 
     const existing = await prisma.taxYear.findUnique({

@@ -193,6 +193,204 @@ export const OCCUPATION_PROFILES: OccupationProfile[] = [
     ],
   },
   {
+    id: 'dj_musician',
+    label: 'DJ / Musician / Music Producer',
+    aliases: ['dj', 'disc jockey', 'musician', 'music producer', 'singer', 'vocalist', 'rapper', 'band', 'composer', 'songwriter', 'beatmaker', 'sound engineer', 'audio engineer', 'performer'],
+    deductions: [
+      { category: 'EQUIPMENT', description: 'Music equipment & instruments', sarsSection: 'Section 11(e)', maxDeductiblePct: 100, keywords: ['guitar', 'keyboard', 'turntable', 'cdj', 'mixer', 'speaker', 'amplifier', 'microphone', 'midi', 'controller', 'pioneer', 'denon', 'takealot', 'music store'], notes: 'Wear & tear over 3-5 years for items >R7,000. Instruments, decks, mixers, speakers, mics all qualify.', requiresProof: 'Invoices + proof of professional use' },
+      { category: 'EQUIPMENT', description: 'Music software & subscriptions', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['spotify', 'beatport', 'ableton', 'logic pro', 'fl studio', 'serato', 'rekordbox', 'splice', 'distrokid', 'tunecore', 'soundcloud', 'bandcamp', 'plugin', 'waves', 'native instruments', 'izotope'], notes: 'DAW software, DJ software, sample packs, distribution platforms', requiresProof: 'Subscription invoices' },
+      { category: 'TRAVEL', description: 'Gig travel & accommodation', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['flight', 'uber', 'hotel', 'airbnb', 'car hire', 'toll', 'parking', 'fuel', 'petrol'], notes: 'Travel to gigs, studio sessions, performances. Keep records of gig dates + venues.', requiresProof: 'Receipts + gig schedule/contracts' },
+      { category: 'MARKETING', description: 'Promotion & marketing', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['facebook ads', 'instagram', 'google ads', 'poster', 'flyer', 'press', 'PR', 'music video', 'photography', 'branding'], notes: 'Social media ads, music video production, promo materials, press kits', requiresProof: 'Ad platform receipts + invoices' },
+      { category: 'PROFESSIONAL', description: 'Agent/manager commissions', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['agent', 'manager', 'booking', 'commission', 'management fee'], notes: 'Fees paid to agents, managers, booking agents', requiresProof: 'Agency invoices/contracts' },
+      { category: 'OFFICE', description: 'Studio rental / home studio', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['studio', 'rehearsal', 'practice room', 'recording'], notes: 'Studio hire or home studio space (proportional if at home)', requiresProof: 'Lease/invoices + floor plan for home studio' },
+      { category: 'INSURANCE', description: 'Equipment insurance', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['equipment insurance', 'instrument insurance', 'music insurance'], notes: 'Insurance on professional music equipment', requiresProof: 'Insurance schedules' },
+      { category: 'PROFESSIONAL', description: 'SAMRO / CAPASSO / SAMPRA royalties admin', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['samro', 'capasso', 'sampra', 'risa'], notes: 'Music rights organisation membership and administration fees', requiresProof: 'Membership receipts' },
+    ],
+    commonMissed: [
+      'Music streaming service subscriptions used for research/work',
+      'Sound treatment and acoustic panels for home studio',
+      'Transport of equipment (courier, trailer hire)',
+      'Costume/stage wardrobe for performances',
+      'Music video production costs',
+      'Sound engineer or producer fees',
+      'SAMRO/CAPASSO membership fees',
+    ],
+    tips: [
+      'Keep a gig diary — dates, venues, fees earned. This proves your music income is professional, not a hobby.',
+      'Your home studio space qualifies as a home office — measure the dedicated area.',
+      'Equipment wear & tear is a MAJOR deduction. A R50,000 DJ setup = ~R25,000 deduction in year 1.',
+      'Register for provisional tax if music income exceeds R30,000/year outside employment.',
+    ],
+  },
+  {
+    id: 'content_creator',
+    label: 'YouTuber / Content Creator / Influencer',
+    aliases: ['youtuber', 'content creator', 'influencer', 'social media', 'blogger', 'vlogger', 'streamer', 'twitch', 'tiktok', 'tiktoker', 'instagram influencer', 'podcaster', 'creator'],
+    deductions: [
+      { category: 'EQUIPMENT', description: 'Camera, lighting & production gear', sarsSection: 'Section 11(e)', maxDeductiblePct: 100, keywords: ['camera', 'canon', 'sony', 'nikon', 'lens', 'tripod', 'gimbal', 'lighting', 'ring light', 'gopro', 'drone', 'microphone', 'rode', 'audio', 'sd card'], notes: 'Cameras, lenses, lighting, audio equipment, drones. Wear & tear over 3 years.', requiresProof: 'Invoices' },
+      { category: 'EQUIPMENT', description: 'Editing software & tools', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['adobe', 'premiere', 'final cut', 'davinci', 'canva', 'photoshop', 'lightroom', 'capcut', 'figma', 'envato', 'epidemic sound', 'artlist', 'storyblocks'], notes: 'Video/photo editing software, stock footage, music licensing', requiresProof: 'Subscription invoices' },
+      { category: 'UTILITIES', description: 'Internet & data', sarsSection: 'Section 11(a)', maxDeductiblePct: 70, keywords: ['fibre', 'internet', 'data', 'vodacom', 'mtn', 'rain', 'afrihost'], notes: 'High % deductible — uploading video content requires significant bandwidth', requiresProof: 'ISP invoices' },
+      { category: 'MARKETING', description: 'Paid promotion & sponsorships', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['boost', 'promotion', 'sponsored', 'facebook ads', 'google ads', 'youtube ads', 'instagram ads'], notes: 'Costs to promote your content and grow your audience', requiresProof: 'Ad platform receipts' },
+      { category: 'OFFICE', description: 'Studio/filming space', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['studio', 'backdrop', 'set design', 'props'], notes: 'Home studio room or rented filming space', requiresProof: 'Lease + floor plan' },
+      { category: 'TRAVEL', description: 'Travel for content creation', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['flight', 'hotel', 'uber', 'airbnb', 'car hire'], notes: 'Travel to filming locations, brand events, collaborations', requiresProof: 'Receipts + content proof (uploaded videos)' },
+      { category: 'PROFESSIONAL', description: 'Editors, designers & freelancers', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['editor', 'freelancer', 'designer', 'thumbnail', 'fiverr', 'upwork'], notes: 'Paying others to edit videos, design thumbnails, manage socials', requiresProof: 'Invoices from freelancers' },
+      { category: 'PROFESSIONAL', description: 'Management & talent agency fees', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['management', 'talent agency', 'mcn', 'agent'], notes: 'Multi-channel network fees, talent manager commissions', requiresProof: 'Agency contracts/invoices' },
+    ],
+    commonMissed: [
+      'Props and set furniture used in content',
+      'Products bought to review (if not gifted/sponsored)',
+      'Phone used for filming/social media (proportional)',
+      'Wardrobe specifically for on-camera — must be "costume" not regular clothing',
+      'Travel to brand collaboration events',
+      'Accounting/tax prep fees',
+      'Domain & hosting for personal website/portfolio',
+    ],
+    tips: [
+      'SARS treats content creation as self-employment — register for provisional tax if income > R30,000.',
+      'Keep records showing your channel/page is a BUSINESS (income statements, brand deals, ad revenue).',
+      'Gifted products for review are taxable income at market value — but you can deduct business use.',
+      'Your home filming space qualifies as a home office if used exclusively for content creation.',
+    ],
+  },
+  {
+    id: 'visual_artist',
+    label: 'Visual Artist / Designer / Photographer',
+    aliases: ['artist', 'painter', 'sculptor', 'graphic designer', 'photographer', 'illustrator', 'animator', 'fine artist', 'craft', 'ceramic', 'printmaker', 'muralist', 'tattoo artist', 'creative director'],
+    deductions: [
+      { category: 'EQUIPMENT', description: 'Art supplies & materials', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['canvas', 'paint', 'brush', 'ink', 'paper', 'clay', 'supplies', 'art materials', 'framing', 'deckle', 'artsavingsclub', 'pen', 'pigment'], notes: 'All consumable materials used to create art for sale', requiresProof: 'Receipts from art supply stores' },
+      { category: 'EQUIPMENT', description: 'Professional equipment', sarsSection: 'Section 11(e)', maxDeductiblePct: 100, keywords: ['camera', 'printer', 'wacom', 'tablet', 'mac', 'imac', 'ipad', 'lens', 'lighting', 'easel', 'kiln'], notes: 'Cameras, computers, drawing tablets, printers. Wear & tear for >R7,000.', requiresProof: 'Invoices' },
+      { category: 'EQUIPMENT', description: 'Design software & subscriptions', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['adobe', 'photoshop', 'illustrator', 'procreate', 'figma', 'sketch', 'affinity', 'capture one', 'lightroom'], notes: 'Creative software subscriptions', requiresProof: 'Subscription invoices' },
+      { category: 'OFFICE', description: 'Studio space', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['studio', 'gallery', 'workspace', 'workshop'], notes: 'Rented studio or home studio (proportional)', requiresProof: 'Lease + floor plan' },
+      { category: 'MARKETING', description: 'Exhibition & marketing costs', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['exhibition', 'gallery commission', 'portfolio', 'business cards', 'website', 'domain'], notes: 'Gallery commissions, exhibition fees, print portfolios, online portfolio hosting', requiresProof: 'Gallery contracts + invoices' },
+      { category: 'TRAVEL', description: 'Travel for shoots/exhibitions', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['flight', 'uber', 'hotel', 'airbnb', 'petrol', 'fuel'], notes: 'Travel to photoshoots, exhibitions, art fairs, client meetings', requiresProof: 'Receipts + event documentation' },
+    ],
+    commonMissed: [
+      'Art supply purchases (often paid cash — keep receipts!)',
+      'Gallery commissions (usually 40-60% of sale price, fully deductible)',
+      'Portfolio website hosting and domain costs',
+      'Art fair stall/entry fees',
+      'Printing and framing costs for exhibitions',
+      'Model hire for photoshoots',
+    ],
+    tips: [
+      'Gallery commissions (30-60%) are deductible against your art income — get statements from galleries.',
+      'If you sell art online (Etsy, own website), platform fees and shipping are deductible.',
+      'Home studio deduction can be substantial — measure your dedicated creative space accurately.',
+      'Keep a catalogue of works sold with dates and prices for SARS income reconciliation.',
+    ],
+  },
+  {
+    id: 'performer_dancer',
+    label: 'Dancer / Performer / Actor',
+    aliases: ['dancer', 'actor', 'actress', 'performer', 'theatre', 'theater', 'stage', 'ballet', 'choreographer', 'stunt', 'voice actor', 'comedian', 'entertainer', 'mc', 'master of ceremonies', 'emcee', 'model'],
+    deductions: [
+      { category: 'TRAINING', description: 'Classes, coaching & workshops', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['dance class', 'acting class', 'coaching', 'workshop', 'masterclass', 'vocal training', 'singing lessons', 'rehearsal'], notes: 'Ongoing training to maintain/improve professional skills', requiresProof: 'Class/studio receipts' },
+      { category: 'EQUIPMENT', description: 'Costumes, shoes & wardrobe', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['costume', 'dance shoes', 'pointe', 'leotard', 'tights', 'performance wear', 'wardrobe', 'makeup', 'wig'], notes: 'Performance-specific clothing, dance shoes, stage costumes. NOT everyday clothing.', requiresProof: 'Receipts + proof of professional use' },
+      { category: 'EQUIPMENT', description: 'Stage makeup & grooming', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['mac cosmetics', 'stage makeup', 'makeup artist', 'hair', 'grooming', 'salon'], notes: 'Stage/performance makeup and hair. Must be for professional appearances, not personal grooming.', requiresProof: 'Receipts + performance schedule' },
+      { category: 'TRAVEL', description: 'Travel to auditions, rehearsals & shows', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['flight', 'uber', 'hotel', 'airbnb', 'fuel', 'petrol', 'toll', 'parking'], notes: 'Travel to auditions, rehearsals, performances, tours', requiresProof: 'Receipts + audition/show schedule' },
+      { category: 'PROFESSIONAL', description: 'Agent & casting fees', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['agent', 'casting', 'agency commission', 'management'], notes: 'Talent agent commissions (typically 10-20% of earnings)', requiresProof: 'Agency statements' },
+      { category: 'PROFESSIONAL', description: 'Union & association fees', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['saga', 'equity', 'union', 'performers'], notes: 'SA Guild of Actors (SAGA) and similar membership fees', requiresProof: 'Membership receipts' },
+      { category: 'MEDICAL', description: 'Physio, sports therapy & body maintenance', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['physiotherapy', 'physio', 'sports massage', 'chiropractor', 'rehabilitation'], notes: 'Body maintenance is a work expense for physical performers. Must show professional necessity.', requiresProof: 'Practitioner receipts + doctor letter' },
+      { category: 'MARKETING', description: 'Headshots, showreel & portfolio', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['headshot', 'photographer', 'showreel', 'portfolio', 'demo reel', 'comp card'], notes: 'Professional marketing materials required for auditions', requiresProof: 'Photographer/videographer invoices' },
+    ],
+    commonMissed: [
+      'Physiotherapy and body maintenance (dancers especially)',
+      'Dance shoes replacement (pointe shoes wear out frequently)',
+      'Self-tape equipment for remote auditions (lighting, backdrop)',
+      'Gym/fitness membership (if body maintenance is professional requirement)',
+      'Agent commissions deducted from earnings',
+    ],
+    tips: [
+      'Keep an audition/booking log — dates, roles, outcomes. This proves professional activity.',
+      'Dance shoes and performance costumes are deductible because they\'re NOT everyday wear.',
+      'If you teach dance/acting on the side, those expenses are separately deductible.',
+      'Physio and sports therapy can be deductible as a work-related expense if your body IS your instrument.',
+    ],
+  },
+  {
+    id: 'sports_professional',
+    label: 'Sports Professional / Athlete / Coach',
+    aliases: ['athlete', 'sportsman', 'sportswoman', 'rugby', 'soccer', 'cricket', 'football', 'swimmer', 'runner', 'cyclist', 'golfer', 'tennis', 'boxing', 'mma', 'personal trainer', 'coach', 'fitness instructor', 'gym instructor', 'yoga instructor', 'pilates', 'sports coach', 'referee'],
+    deductions: [
+      { category: 'EQUIPMENT', description: 'Sports equipment & gear', sarsSection: 'Section 11(e)', maxDeductiblePct: 100, keywords: ['sports equipment', 'running shoes', 'bike', 'bicycle', 'golf', 'racket', 'bat', 'gloves', 'boots', 'wetsuit', 'sportsmans warehouse', 'totalsports', 'adidas', 'nike', 'under armour'], notes: 'Professional sports equipment, training gear, competition kit. Wear & tear for >R7,000.', requiresProof: 'Invoices + proof of professional use' },
+      { category: 'TRAINING', description: 'Coaching, training & facilities', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['coaching', 'training', 'gym membership', 'swimming pool', 'track', 'club fees', 'personal trainer', 'strength', 'conditioning'], notes: 'Gym memberships, coaching fees, training facility access — if required for professional sport', requiresProof: 'Facility/coach receipts + club confirmation' },
+      { category: 'TRAINING', description: 'Sports certifications & courses', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['certification', 'coaching course', 'referee course', 'first aid', 'CPR', 'REPSSA', 'fitness qualification'], notes: 'Required certifications and continuing education', requiresProof: 'Certificate + course receipts' },
+      { category: 'MEDICAL', description: 'Sports medicine & rehabilitation', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['physiotherapy', 'physio', 'sports doctor', 'rehabilitation', 'sports massage', 'chiropractor', 'biokineticist', 'orthopaedic', 'supplement'], notes: 'Injury prevention and treatment, sports medicine consultations. Directly work-related for athletes.', requiresProof: 'Medical receipts + doctor letters' },
+      { category: 'TRAVEL', description: 'Travel to events & competitions', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['flight', 'hotel', 'airbnb', 'uber', 'fuel', 'race entry', 'competition', 'tournament', 'event'], notes: 'Travel, accommodation, and entry fees for competitions and tournaments', requiresProof: 'Receipts + event entry confirmation' },
+      { category: 'PROFESSIONAL', description: 'Agent & federation fees', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['agent', 'federation', 'sports association', 'athletics sa', 'cricket sa', 'safa'], notes: 'Sports agent commissions, federation/association membership', requiresProof: 'Agent contract + federation receipts' },
+      { category: 'EQUIPMENT', description: 'Nutrition & supplements', sarsSection: 'Section 11(a)', maxDeductiblePct: 50, keywords: ['supplement', 'protein', 'dis-chem', 'nutrition', 'vitamins', 'sports drink'], notes: 'Performance supplements for professional athletes — typically 50% deductible. Must show professional necessity.', requiresProof: 'Receipts + nutritionist recommendation' },
+      { category: 'INSURANCE', description: 'Sports/injury insurance', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['sports insurance', 'injury insurance', 'disability', 'income protection'], notes: 'Insurance against sports injuries that could affect income', requiresProof: 'Insurance policy + payment receipts' },
+    ],
+    commonMissed: [
+      'Race/competition entry fees',
+      'Sports nutrition and supplements (proportional)',
+      'Injury rehabilitation costs',
+      'GPS/tracking devices for training',
+      'Physiotherapy and biokineticist sessions',
+      'Branded gear sponsorship value if you provide services in return',
+    ],
+    tips: [
+      'Professional athletes: gym memberships ARE deductible because physical fitness is your job requirement.',
+      'Keep a training log — it strengthens claims for training-related expenses.',
+      'Competition prize money IS taxable income. Keep records of all winnings.',
+      'If you coach part-time, those expenses are deductible against coaching income.',
+      'Sports supplements are a grey area — get a nutritionist letter stating professional requirement.',
+    ],
+  },
+  {
+    id: 'creative_media',
+    label: 'Film / TV / Media Professional',
+    aliases: ['filmmaker', 'videographer', 'camera operator', 'editor', 'producer', 'director', 'production', 'media', 'broadcast', 'journalist', 'presenter', 'news anchor', 'radio presenter', 'video editor', 'motion graphics', 'vfx', 'sound designer'],
+    deductions: [
+      { category: 'EQUIPMENT', description: 'Camera & production equipment', sarsSection: 'Section 11(e)', maxDeductiblePct: 100, keywords: ['camera', 'lens', 'tripod', 'gimbal', 'drone', 'lighting', 'audio', 'monitor', 'storage', 'hard drive', 'ssd'], notes: 'Professional camera gear, audio equipment, storage. Wear & tear over 2-5 years.', requiresProof: 'Invoices' },
+      { category: 'EQUIPMENT', description: 'Editing hardware & software', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['adobe', 'premiere', 'after effects', 'davinci', 'final cut', 'avid', 'mac', 'imac', 'mac pro', 'external drive'], notes: 'Editing suite, NLE software, motion graphics tools', requiresProof: 'Subscription/purchase invoices' },
+      { category: 'OFFICE', description: 'Edit suite / office space', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['studio', 'edit suite', 'office', 'workspace'], notes: 'Dedicated editing or production office space', requiresProof: 'Lease + floor plan' },
+      { category: 'TRAVEL', description: 'Location travel & shoots', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['flight', 'hotel', 'uber', 'car hire', 'fuel', 'location', 'shoot', 'recce'], notes: 'Travel to shoots, recces, edit sessions, meetings', requiresProof: 'Receipts + call sheets' },
+      { category: 'PROFESSIONAL', description: 'Industry memberships', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['nfvf', 'ipp', 'safta', 'press club', 'sanef'], notes: 'National Film and Video Foundation, industry guild fees', requiresProof: 'Membership receipts' },
+      { category: 'INSURANCE', description: 'Equipment insurance', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['equipment insurance', 'camera insurance', 'production insurance'], notes: 'Insurance on production gear', requiresProof: 'Insurance schedules' },
+      { category: 'PROFESSIONAL', description: 'Crew & freelancer payments', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['crew', 'freelancer', 'sound', 'gaffer', 'grip', 'makeup', 'catering'], notes: 'Payments to crew members on your productions', requiresProof: 'Invoices/contracts from crew' },
+    ],
+    commonMissed: [
+      'Hard drive and storage costs (data-heavy industry)',
+      'Stock footage and music licensing fees',
+      'Location fees and permits',
+      'Equipment insurance premiums',
+      'Festival submission fees',
+      'Portfolio/showreel hosting costs',
+    ],
+    tips: [
+      'Keep call sheets and production schedules as proof of business activities.',
+      'Storage costs (SSDs, cloud backup) add up and are fully deductible.',
+      'If you own your equipment and rent it to productions, that\'s a separate income stream with its own deductions.',
+      'The NFVF, DTI film incentives, and provincial film commissions may offer additional rebates on qualifying productions.',
+    ],
+  },
+  {
+    id: 'health_fitness',
+    label: 'Health & Wellness Professional',
+    aliases: ['nutritionist', 'dietitian', 'wellness', 'massage therapist', 'beauty therapist', 'aesthetician', 'nail technician', 'hairdresser', 'barber', 'spa therapist', 'life coach', 'motivational speaker', 'counsellor', 'psychologist', 'hypnotherapist', 'naturopath', 'homeopath'],
+    deductions: [
+      { category: 'PROFESSIONAL', description: 'Professional registration', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['hpcsa', 'ahpcsa', 'health council', 'registration', 'professional body'], notes: 'HPCSA or AHPCSA registration for regulated practitioners', requiresProof: 'Registration receipt' },
+      { category: 'EQUIPMENT', description: 'Professional tools & products', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['supplies', 'products', 'tools', 'equipment', 'treatment bed', 'salon'], notes: 'Treatment products, professional tools, salon equipment', requiresProof: 'Supplier invoices' },
+      { category: 'OFFICE', description: 'Treatment room / practice space', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['rent', 'salon', 'practice', 'room hire', 'spa'], notes: 'Salon/studio/practice room rental or home-based space', requiresProof: 'Lease + utilities' },
+      { category: 'TRAINING', description: 'CPD & continuing education', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['cpd', 'course', 'certification', 'training', 'workshop', 'conference'], notes: 'Ongoing professional development courses and certifications', requiresProof: 'CPD certificates + receipts' },
+      { category: 'INSURANCE', description: 'Professional indemnity insurance', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['indemnity', 'professional insurance', 'liability', 'malpractice'], notes: 'Professional liability/indemnity insurance', requiresProof: 'Insurance certificate' },
+      { category: 'MARKETING', description: 'Marketing & client acquisition', sarsSection: 'Section 11(a)', maxDeductiblePct: 100, keywords: ['facebook ads', 'google ads', 'instagram', 'website', 'domain', 'business cards', 'fresha', 'cliniko'], notes: 'Online ads, booking platform fees, marketing materials', requiresProof: 'Ad receipts + platform invoices' },
+    ],
+    commonMissed: [
+      'Booking platform fees (Fresha, Cliniko, etc.)',
+      'Cleaning and hygiene supplies for treatment spaces',
+      'Professional product samples',
+      'Laundry costs for professional towels/linens',
+      'Business portion of vehicle if doing home visits',
+    ],
+    tips: [
+      'If you rent a chair/room in a salon, that rental is fully deductible against your income.',
+      'Product costs are deductible when used on clients — keep business and personal purchases separate.',
+      'If you run a mobile service (home visits), vehicle logbook is essential for travel deductions.',
+    ],
+  },
+  {
     id: 'general_employed',
     label: 'General Employment (Salaried)',
     aliases: ['employed', 'salaried', 'office worker', 'administrator', 'manager', 'clerk', 'general', 'receptionist', 'PA', 'executive', 'director'],
@@ -485,6 +683,7 @@ export function buildAnalysisPrompt(profile: {
   worksFromHome?: boolean;
   usesVehicleForWork?: boolean;
   homeOfficePct?: number;
+  taxNotes?: string;
 }): string {
   // Find matching occupation profile
   const occLower = (profile.occupation || '').toLowerCase();
@@ -517,6 +716,10 @@ export function buildAnalysisPrompt(profile: {
 
   if (profile.usesVehicleForWork) {
     sections.push(`VEHICLE: The user uses a personal vehicle for business. Flag fuel, vehicle insurance, servicing, tyres, licence fees, tolls, parking. Must distinguish business from personal travel.`);
+  }
+
+  if (profile.taxNotes && profile.taxNotes.trim()) {
+    sections.push(`USER'S ADDITIONAL CONTEXT (treat as sworn testimony — use this to make more accurate deduction decisions):\n${profile.taxNotes.trim()}`);
   }
 
   const employmentContext = profile.employmentType === 'self_employed' || profile.employmentType === 'commission'

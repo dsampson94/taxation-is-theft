@@ -38,6 +38,7 @@ interface ProfileData {
   age: number;
   taxNumber: string;
   entityType: string;
+  taxNotes: string;
 }
 
 const STEPS = [
@@ -74,6 +75,7 @@ export default function TaxProfilePage() {
     age: 30,
     taxNumber: '',
     entityType: 'INDIVIDUAL',
+    taxNotes: '',
   });
 
   useEffect(() => {
@@ -104,6 +106,7 @@ export default function TaxProfilePage() {
           hasOutOfPocketMedical: u.hasOutOfPocketMedical || false,
           taxNumber: u.taxNumber || '',
           entityType: u.entityType || 'INDIVIDUAL',
+          taxNotes: u.taxNotes || '',
         }));
       }
     } catch {} finally {
@@ -112,6 +115,22 @@ export default function TaxProfilePage() {
   };
 
   const saveProfile = async () => {
+    if (!profile.occupation.trim()) {
+      toast.error('Please enter your occupation');
+      setStep(0);
+      return;
+    }
+    if (!profile.age || profile.age < 18) {
+      toast.error('Please enter a valid age (18+)');
+      setStep(0);
+      return;
+    }
+    if (!profile.employmentType) {
+      toast.error('Please select your employment type');
+      setStep(0);
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await fetch('/api/profile', {
@@ -125,9 +144,10 @@ export default function TaxProfilePage() {
       if (res.ok) {
         await refreshUser();
         toast.success('Tax profile saved! Your AI analysis will now be personalized.');
-        router.push('/dashboard');
+        router.push('/upload');
       } else {
-        toast.error('Failed to save profile');
+        const data = await res.json();
+        toast.error(data.error || 'Failed to save profile');
       }
     } catch {
       toast.error('Failed to save profile');
@@ -724,6 +744,27 @@ export default function TaxProfilePage() {
                   ))}
                 </div>
               </div>
+
+              {/* Additional context for AI */}
+              <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <label className="label">Additional Context for AI (optional)</label>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  Share anything that helps the AI identify your deductions more accurately. This info is sent with every analysis.
+                </p>
+                <textarea
+                  value={profile.taxNotes}
+                  onChange={e => update('taxNotes', e.target.value)}
+                  className="input w-full h-32 resize-y"
+                  maxLength={2000}
+                  placeholder={"Examples:\n• I run my DJ business from home and buy equipment monthly\n• I have a separate business bank account at FNB\n• I pay R2,000/month for a co-working space\n• My Spotify subscription is for work — I'm a music producer\n• I know my gym expense qualifies — I'm a personal trainer"}
+                />
+                <div className="flex justify-between mt-1">
+                  <p className="text-xs text-slate-400">
+                    Tell us what definitely qualifies, what doesn&apos;t, and anything that helps identify deductions
+                  </p>
+                  <span className="text-xs text-slate-400">{profile.taxNotes.length}/2000</span>
+                </div>
+              </div>
             </div>
           )}
 
@@ -763,6 +804,13 @@ export default function TaxProfilePage() {
                     <div className="font-medium">{profile.usesVehicleForWork ? `Yes (${profile.annualBusinessKm.toLocaleString()} km)` : 'No'}</div>
                   </div>
                 </div>
+
+                {profile.taxNotes && (
+                  <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                    <div className="text-xs text-slate-500 mb-1">Your Additional Context</div>
+                    <div className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{profile.taxNotes}</div>
+                  </div>
+                )}
               </div>
 
               <div className="bg-brand-50 dark:bg-brand-950/20 rounded-lg p-4 border border-brand-200 dark:border-brand-800 mb-4">

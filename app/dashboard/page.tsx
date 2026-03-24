@@ -41,15 +41,10 @@ const formatZAR = (amount: number | null) => {
   }).format(amount);
 };
 
-function getTaxYearOptions() {
-  const now = new Date();
-  const currentMonth = now.getMonth(); // 0-indexed (0=Jan)
-  const currentYear = now.getFullYear();
-  // SA tax year: March–February. If Jan/Feb, the "current" year started the previous calendar year.
-  const latestStartYear = currentMonth >= 2 ? currentYear : currentYear - 1;
+// Full range of SA tax years users can build their history with
+function getAllTaxYearOptions() {
   const years: string[] = [];
-  for (let i = 0; i < 6; i++) {
-    const start = latestStartYear - i;
+  for (let start = 2030; start >= 2000; start--) {
     years.push(`${start}/${start + 1}`);
   }
   return years;
@@ -89,16 +84,16 @@ export default function DashboardPage() {
     }
   };
 
-  const createTaxYear = async (yearLabel?: string) => {
+  const createTaxYear = async (yearLabel: string) => {
     try {
       const res = await fetch('/api/tax-years', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ yearLabel: yearLabel || undefined }),
+        body: JSON.stringify({ yearLabel }),
       });
       if (res.ok) {
         const data = await res.json();
-        toast.success(`Tax year ${data.taxYear.yearLabel} created`);
+        toast.success(`Tax year ${data.taxYear.yearLabel} added`);
         setShowYearPicker(false);
         setSelectedYear('');
         fetchTaxYears();
@@ -112,7 +107,7 @@ export default function DashboardPage() {
   };
 
   const existingLabels = taxYears.map(ty => ty.yearLabel);
-  const availableYears = getTaxYearOptions().filter(y => !existingLabels.includes(y));
+  const availableYears = getAllTaxYearOptions().filter(y => !existingLabels.includes(y));
 
   if (authLoading || !user) {
     return (
@@ -213,17 +208,17 @@ export default function DashboardPage() {
           {/* Year picker modal */}
           {showYearPicker && (
             <div className="card mb-4 border-brand-200 dark:border-brand-800 bg-brand-50/50 dark:bg-brand-950/20">
-              <h3 className="font-semibold mb-3 text-slate-900 dark:text-white">Add an older tax year</h3>
-              <p className="text-xs text-slate-500 mb-3">SA tax years run March to February. Your recent years were created automatically.</p>
+              <h3 className="font-semibold mb-3 text-slate-900 dark:text-white">Add a Tax Year</h3>
+              <p className="text-xs text-slate-500 mb-3">SA tax years run March to February. Select a year, then upload 12 monthly statements for it.</p>
               {availableYears.length === 0 ? (
-              <p className="text-sm text-slate-500">You already have all recent tax years.</p>
+                <p className="text-sm text-slate-500">You already have all available tax years.</p>
               ) : (
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-1.5 mb-4 max-h-48 overflow-y-auto">
                   {availableYears.map(year => (
                     <button
                       key={year}
                       onClick={() => setSelectedYear(year)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                         selectedYear === year
                           ? 'bg-brand-600 text-white border-brand-600'
                           : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:border-brand-400 text-slate-700 dark:text-slate-200'
@@ -236,11 +231,11 @@ export default function DashboardPage() {
               )}
               <div className="flex gap-2">
                 <button
-                  onClick={() => createTaxYear(selectedYear || undefined)}
-                  disabled={!selectedYear && availableYears.length > 0}
+                  onClick={() => createTaxYear(selectedYear)}
+                  disabled={!selectedYear}
                   className="btn-primary py-2 px-4 text-sm"
                 >
-                  Create {selectedYear || 'Tax Year'}
+                  Add {selectedYear || 'Tax Year'}
                 </button>
                 <button onClick={() => { setShowYearPicker(false); setSelectedYear(''); }} className="btn-secondary py-2 px-4 text-sm">
                   Cancel

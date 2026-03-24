@@ -75,6 +75,23 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    // Clamp numeric fields to valid ranges
+    if (typeof data.homeOfficePct === 'number') {
+      data.homeOfficePct = Math.min(100, Math.max(0, data.homeOfficePct as number));
+    }
+    if (typeof data.medicalAidMembers === 'number') {
+      data.medicalAidMembers = Math.max(0, Math.round(data.medicalAidMembers as number));
+    }
+    if (typeof data.annualBusinessKm === 'number') {
+      data.annualBusinessKm = Math.max(0, Math.round(data.annualBusinessKm as number));
+    }
+    if (data.monthlyMedicalAidFee !== undefined && data.monthlyMedicalAidFee !== null) {
+      data.monthlyMedicalAidFee = Math.max(0, Number(data.monthlyMedicalAidFee));
+    }
+    if (data.annualRAContribution !== undefined && data.annualRAContribution !== null) {
+      data.annualRAContribution = Math.max(0, Number(data.annualRAContribution));
+    }
+
     const updated = await prisma.user.update({
       where: { id: authUser.userId },
       data,

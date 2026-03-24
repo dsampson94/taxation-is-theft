@@ -54,21 +54,29 @@ export default function UploadPage() {
   }, [user]);
 
   const fetchTaxYears = async () => {
-    const res = await fetch('/api/tax-years');
-    if (res.ok) {
-      const data = await res.json();
-      setTaxYears(data.taxYears);
-      if (!taxYearId && data.taxYears.length > 0) {
-        setTaxYearId(data.taxYears[0].id);
+    try {
+      const res = await fetch('/api/tax-years');
+      if (res.ok) {
+        const data = await res.json();
+        setTaxYears(data.taxYears);
+        if (!taxYearId && data.taxYears.length > 0) {
+          setTaxYearId(data.taxYears[0].id);
+        }
       }
+    } catch {
+      toast.error('Failed to load tax years');
     }
   };
 
   const fetchProfile = async () => {
-    const res = await fetch('/api/profile');
-    if (res.ok) {
-      const data = await res.json();
-      setOccupation(data.user.occupation || '');
+    try {
+      const res = await fetch('/api/profile');
+      if (res.ok) {
+        const data = await res.json();
+        setOccupation(data.user.occupation || '');
+      }
+    } catch {
+      // Profile fetch failure is non-critical
     }
   };
 
@@ -106,6 +114,9 @@ export default function UploadPage() {
       }
 
       const data = await res.json();
+      if (data.warning) {
+        toast.error(data.warning, { duration: 6000 });
+      }
       setFiles(prev =>
         prev.map((f, i) =>
           i === index ? { ...f, status: 'parsed', text: data.text, pages: data.pages } : f

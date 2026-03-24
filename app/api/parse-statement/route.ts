@@ -53,10 +53,24 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const pageCount = pdf.Pages?.length || 0;
+    const trimmedText = fullText.trim();
+
+    // Warn if PDF appears to be scanned/image-based (very little text extracted)
+    if (pageCount > 0 && trimmedText.length < pageCount * 50) {
+      return NextResponse.json({
+        success: true,
+        text: trimmedText,
+        pages: pageCount,
+        fileName: file.name,
+        warning: 'Very little text was extracted from this PDF. It may be a scanned document. For best results, use a text-based PDF from your bank\'s online banking portal.',
+      });
+    }
+
     return NextResponse.json({
       success: true,
-      text: fullText,
-      pages: pdf.Pages?.length || 0,
+      text: trimmedText,
+      pages: pageCount,
       fileName: file.name,
     });
   } catch (error) {

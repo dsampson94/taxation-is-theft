@@ -78,7 +78,7 @@ export async function PATCH(request: NextRequest) {
       data: {
         userCategory: category || undefined,
         isDeductible: isDeductible !== undefined ? isDeductible : undefined,
-        deductiblePct: deductiblePct !== undefined ? deductiblePct : undefined,
+        deductiblePct: deductiblePct !== undefined ? Math.min(100, Math.max(0, deductiblePct)) : undefined,
         notes: notes || undefined,
         userOverride: true,
       },

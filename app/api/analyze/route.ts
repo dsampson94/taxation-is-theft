@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    if (user.credits <= 0 && user.planType === 'FREE') {
-      return NextResponse.json({ error: 'No credits remaining. Please upgrade your plan.' }, { status: 403 });
+    if (user.credits <= 0) {
+      return NextResponse.json({ error: 'No credits remaining. Please purchase more credits.' }, { status: 403 });
     }
 
     const { text, occupation, taxYearId } = await request.json();
@@ -122,7 +122,12 @@ export async function POST(request: NextRequest) {
 
     // If taxYearId provided, save transactions to DB
     if (taxYearId && analysisResult.transactions) {
-      const txData = analysisResult.transactions.map((tx: any) => ({
+      const txData = analysisResult.transactions
+        .filter((tx: any) => {
+          const d = new Date(tx.date);
+          return !isNaN(d.getTime());
+        })
+        .map((tx: any) => ({
         userId: user.id,
         taxYearId,
         date: new Date(tx.date),

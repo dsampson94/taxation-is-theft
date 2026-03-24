@@ -198,20 +198,16 @@ function UploadContent() {
         let finalData: any = null;
         let streamError: string | null = null;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buf += decoder.decode(value, { stream: true });
-
-          // Parse SSE events from buffer
-          const parts = buf.split('\n\n');
-          buf = parts.pop() || '';
-          for (const part of parts) {
-            const eventMatch = part.match(/^event: (\w+)\ndata: ([\s\S]+)$/);
-            if (!eventMatch) continue;
-            const [, eventType, dataStr] = eventMatch;
+        const processEvent = (raw: string) => {
+          let eventType = '';
+          let dataStr = '';
+          for (const line of raw.split('\n')) {
+            if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+            else if (line.startsWith('data: ')) dataStr = line.slice(6);
+          }
+          if (!eventType || !dataStr) return;
+          try {
             const payload = JSON.parse(dataStr);
-
             if (eventType === 'progress') {
               setFiles(prev => prev.map((file, idx) =>
                 idx === i ? { ...file, status: 'analyzing', statusMessage: payload.message } : file
@@ -219,10 +215,26 @@ function UploadContent() {
             } else if (eventType === 'done') {
               finalData = payload;
             } else if (eventType === 'error') {
-              streamError = payload.error;
+              streamError = payload.error || 'Analysis failed';
             }
+          } catch { /* skip malformed events */ }
+        };
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+
+          let idx;
+          while ((idx = buf.indexOf('\n\n')) !== -1) {
+            const raw = buf.slice(0, idx);
+            buf = buf.slice(idx + 2);
+            processEvent(raw);
           }
         }
+        // Flush remaining buffer
+        buf += decoder.decode();
+        if (buf.trim()) processEvent(buf);
 
         if (streamError) throw new Error(streamError);
         if (!finalData) throw new Error('No response received from analysis');

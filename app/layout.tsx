@@ -24,6 +24,15 @@ export const metadata: Metadata = {
     "personal income tax",
     "tax calculator",
   ],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "TIT Tax",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +44,8 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <meta name="theme-color" content="#0060c9" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -46,6 +57,11 @@ export default function RootLayout({
                   }
                 } catch(e) {}
               })();
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
             `,
           }}
         />

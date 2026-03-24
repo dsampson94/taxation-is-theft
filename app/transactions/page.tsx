@@ -141,15 +141,12 @@ function TransactionsContent() {
     <div className="min-h-[calc(100vh-4rem)]">
       <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-4 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-3 backdrop-blur-sm">
             <Filter size={16} />
             Transaction Review
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Transactions</h1>
-          <p className="text-brand-200 text-sm">
-            Review and adjust AI-categorized transactions.
-            Flag items for review or edit categories before generating your report.
-          </p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1">Transactions</h1>
+          <p className="text-brand-200 text-sm">Review and adjust AI-categorized transactions</p>
         </div>
       </section>
 

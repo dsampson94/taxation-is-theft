@@ -175,7 +175,7 @@ function UploadContent() {
         text = parsed;
       }
 
-      // Analyze
+      // Analyze via SSE stream (avoids Vercel 60s timeout)
       setFiles(prev => prev.map((file, idx) => idx === i ? { ...file, status: 'analyzing' } : file));
 
       try {
@@ -186,17 +186,53 @@ function UploadContent() {
         });
 
         if (!res.ok) {
+          // Non-streaming error (auth, credits, validation)
           const err = await res.json();
           throw new Error(err.error || 'Analysis failed');
         }
 
-        const data = await res.json();
+        // Read SSE stream
+        const reader = res.body!.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+        let finalData: any = null;
+        let streamError: string | null = null;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+
+          // Parse SSE events from buffer
+          const parts = buf.split('\n\n');
+          buf = parts.pop() || '';
+          for (const part of parts) {
+            const eventMatch = part.match(/^event: (\w+)\ndata: ([\s\S]+)$/);
+            if (!eventMatch) continue;
+            const [, eventType, dataStr] = eventMatch;
+            const payload = JSON.parse(dataStr);
+
+            if (eventType === 'progress') {
+              setFiles(prev => prev.map((file, idx) =>
+                idx === i ? { ...file, status: 'analyzing', statusMessage: payload.message } : file
+              ));
+            } else if (eventType === 'done') {
+              finalData = payload;
+            } else if (eventType === 'error') {
+              streamError = payload.error;
+            }
+          }
+        }
+
+        if (streamError) throw new Error(streamError);
+        if (!finalData) throw new Error('No response received from analysis');
+
         setFiles(prev =>
           prev.map((file, idx) =>
-            idx === i ? { ...file, status: 'done', analysis: data.analysis } : file
+            idx === i ? { ...file, status: 'done', analysis: finalData.analysis, statusMessage: undefined } : file
           )
         );
-        results.push(data.analysis);
+        results.push(finalData.analysis);
       } catch (error: any) {
         setFiles(prev =>
           prev.map((file, idx) => idx === i ? { ...file, status: 'error', error: error.message } : file)
@@ -235,16 +271,15 @@ function UploadContent() {
     <div className="min-h-[calc(100vh-4rem)]">
       <section className="bg-gradient-to-b from-brand-800 to-brand-950 text-white py-8">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-4 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm font-medium mb-3 backdrop-blur-sm">
             <Upload size={16} />
             Statement Upload
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1">
             Extract Bank Statement Info
           </h1>
           <p className="text-brand-200 text-sm">
-            Upload your bank statement PDFs and let AI extract and categorize your transactions.
-            Your files are processed in memory and never stored.
+            Upload your bank statement PDFs and let AI extract and categorize your transactions
           </p>
         </div>
       </section>
@@ -466,7 +501,7 @@ function UploadContent() {
                     {f.status === 'analyzing' && (
                       <div className="flex items-center gap-1">
                         <Loader2 size={16} className="text-brand-500 animate-spin" />
-                        <span className="text-xs text-brand-500">AI analyzing...</span>
+                        <span className="text-xs text-brand-500">{(f as any).statusMessage || 'AI analyzing...'}</span>
                       </div>
                     )}
                     {f.status === 'done' && (

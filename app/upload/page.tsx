@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useDropzone } from 'react-dropzone';
@@ -17,6 +17,14 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+export default function UploadPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[calc(100vh-4rem)] items-center justify-center"><div className="animate-pulse text-slate-400">Loading...</div></div>}>
+      <UploadContent />
+    </Suspense>
+  );
+}
+
 interface UploadedFile {
   file: File;
   status: 'pending' | 'parsing' | 'parsed' | 'analyzing' | 'done' | 'error';
@@ -29,7 +37,7 @@ interface UploadedFile {
 const formatZAR = (amount: number) =>
   new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(amount);
 
-export default function UploadPage() {
+function UploadContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();

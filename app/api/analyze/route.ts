@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
-import openai, { ANALYZE_STATEMENT_PROMPT, buildAnalysisPrompt } from '@/app/lib/openai';
+import { getOpenAI, ANALYZE_STATEMENT_PROMPT, buildAnalysisPrompt } from '@/app/lib/openai';
 import { validateAndEnrichAnalysis, type AnalyzedTransaction } from '@/app/lib/deduction-rules';
 
 export const runtime = 'nodejs';
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     // Truncate text if too long for API (keep ~50k chars)
     const truncatedText = text.length > 50000 ? text.substring(0, 50000) + '\n[TRUNCATED]' : text;
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [
         { role: 'system', content: prompt },

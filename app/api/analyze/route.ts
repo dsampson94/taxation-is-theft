@@ -86,6 +86,9 @@ export async function POST(request: NextRequest) {
           occupation: userOccupation,
           employmentType: user.employmentType || undefined,
           entityType: user.entityType || undefined,
+          age: user.dateOfBirth
+            ? Math.floor((Date.now() - new Date(user.dateOfBirth).getTime()) / 31557600000)
+            : undefined,
           hasMedicalAid: user.hasMedicalAid,
           medicalAidMembers: user.medicalAidMembers || undefined,
           monthlyMedicalAidFee: user.monthlyMedicalAidFee ? Number(user.monthlyMedicalAidFee) : undefined,

@@ -68,6 +68,12 @@ export async function PATCH(request: NextRequest) {
       'makesDonations', 'hasOutOfPocketMedical', 'taxProfileComplete',
     ];
 
+    // Convert age (number) to dateOfBirth (Date) if provided
+    if (body.age && typeof body.age === 'number' && body.age >= 1 && body.age <= 120) {
+      const now = new Date();
+      body.dateOfBirth = new Date(now.getFullYear() - body.age, now.getMonth(), now.getDate());
+    }
+
     const data: Record<string, unknown> = {};
     for (const field of allowedFields) {
       if (body[field] !== undefined) {

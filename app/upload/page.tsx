@@ -186,62 +186,39 @@ function UploadContent() {
         });
 
         if (!res.ok) {
-          // Non-streaming error (auth, credits, validation)
           const err = await res.json();
           throw new Error(err.error || 'Analysis failed');
         }
 
-        // Read SSE stream
-        const reader = res.body!.getReader();
-        const decoder = new TextDecoder();
-        let buf = '';
+        // Read the full SSE response as text, then parse events
+        const responseText = await res.text();
         let finalData: any = null;
         let streamError: string | null = null;
 
-        const processEvent = (raw: string) => {
+        // Split by double-newline (SSE event delimiter) — handle both \n\n and \r\n\r\n
+        const events = responseText.split(/\r?\n\r?\n/);
+        for (const raw of events) {
+          if (!raw.trim()) continue;
           let eventType = '';
           let dataStr = '';
-          for (const line of raw.split('\n')) {
+          for (const line of raw.split(/\r?\n/)) {
             if (line.startsWith('event: ')) eventType = line.slice(7).trim();
             else if (line.startsWith('data: ')) dataStr = line.slice(6);
           }
-          if (!eventType || !dataStr) return;
+          if (!eventType || !dataStr) continue;
           try {
             const payload = JSON.parse(dataStr);
-            if (eventType === 'progress') {
-              setFiles(prev => prev.map((file, idx) =>
-                idx === i ? { ...file, status: 'analyzing', statusMessage: payload.message } : file
-              ));
-            } else if (eventType === 'done') {
-              finalData = payload;
-            } else if (eventType === 'error') {
-              streamError = payload.error || 'Analysis failed';
-            }
-          } catch { /* skip malformed events */ }
-        };
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buf += decoder.decode(value, { stream: true });
-
-          let idx;
-          while ((idx = buf.indexOf('\n\n')) !== -1) {
-            const raw = buf.slice(0, idx);
-            buf = buf.slice(idx + 2);
-            processEvent(raw);
-          }
+            if (eventType === 'done') finalData = payload;
+            else if (eventType === 'error') streamError = payload.error || 'Analysis failed';
+          } catch { /* skip malformed */ }
         }
-        // Flush remaining buffer
-        buf += decoder.decode();
-        if (buf.trim()) processEvent(buf);
 
         if (streamError) throw new Error(streamError);
-        if (!finalData) throw new Error('No response received from analysis');
+        if (!finalData) throw new Error('Analysis failed — no result received');
 
         setFiles(prev =>
           prev.map((file, idx) =>
-            idx === i ? { ...file, status: 'done', analysis: finalData.analysis, statusMessage: undefined } : file
+            idx === i ? { ...file, status: 'done', analysis: finalData.analysis } : file
           )
         );
         results.push(finalData.analysis);

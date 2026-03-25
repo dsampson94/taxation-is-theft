@@ -185,43 +185,22 @@ function UploadContent() {
           body: JSON.stringify({ text, occupation, taxYearId, fileName: f.file.name, fileSize: f.file.size }),
         });
 
+        const data = await res.json();
+
         if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || 'Analysis failed');
+          throw new Error(data.error || 'Analysis failed');
         }
 
-        // Read the full SSE response as text, then parse events
-        const responseText = await res.text();
-        let finalData: any = null;
-        let streamError: string | null = null;
-
-        // Split by double-newline (SSE event delimiter) — handle both \n\n and \r\n\r\n
-        const events = responseText.split(/\r?\n\r?\n/);
-        for (const raw of events) {
-          if (!raw.trim()) continue;
-          let eventType = '';
-          let dataStr = '';
-          for (const line of raw.split(/\r?\n/)) {
-            if (line.startsWith('event: ')) eventType = line.slice(7).trim();
-            else if (line.startsWith('data: ')) dataStr = line.slice(6);
-          }
-          if (!eventType || !dataStr) continue;
-          try {
-            const payload = JSON.parse(dataStr);
-            if (eventType === 'done') finalData = payload;
-            else if (eventType === 'error') streamError = payload.error || 'Analysis failed';
-          } catch { /* skip malformed */ }
+        if (!data.analysis) {
+          throw new Error('No analysis result received');
         }
-
-        if (streamError) throw new Error(streamError);
-        if (!finalData) throw new Error('Analysis failed — no result received');
 
         setFiles(prev =>
           prev.map((file, idx) =>
-            idx === i ? { ...file, status: 'done', analysis: finalData.analysis } : file
+            idx === i ? { ...file, status: 'done', analysis: data.analysis } : file
           )
         );
-        results.push(finalData.analysis);
+        results.push(data.analysis);
       } catch (error: any) {
         setFiles(prev =>
           prev.map((file, idx) => idx === i ? { ...file, status: 'error', error: error.message } : file)

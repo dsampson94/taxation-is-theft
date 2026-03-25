@@ -1,9 +1,63 @@
 import Link from 'next/link';
 import { Upload, Brain, FileText, Shield, TrendingDown, Zap } from 'lucide-react';
+import type { Metadata } from 'next';
+import SeoFooter from './components/SeoFooter';
+
+export const metadata: Metadata = {
+  title: "AI-Powered Tax Assistant for South Africans | TIT Tax",
+  description:
+    "Upload your bank statements, let AI find your deductions, and pay the least tax legally possible. Supports FNB, Standard Bank, Nedbank, Absa, Capitec. Free first analysis.",
+  alternates: {
+    canonical: "https://taxationistheft.co.za",
+  },
+};
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How does TIT Tax work?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Upload your bank statement PDFs from any major South African bank. Our AI analyzes every transaction, categorizes expenses, identifies tax-deductible items specific to your profession, and generates a SARS-compliant tax report.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Which South African banks are supported?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "TIT Tax supports FNB, Standard Bank, Nedbank, Absa, Capitec, Investec, Discovery Bank, and most other South African banks that provide PDF statements.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is TIT Tax free to use?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, your first bank statement analysis is completely free — no credit card required. You only pay when you want to generate your full tax report.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is this SARS compliant?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Every deduction identified by TIT Tax references the relevant SARS section. The tool is fully legal, fully compliant, and fully documented to help you pay less tax within the law.",
+      },
+    },
+  ],
+};
 
 export default function Home() {
   return (
     <div className="flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-brand-700 via-brand-800 to-brand-950 text-white">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
@@ -181,46 +235,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white font-black text-xs">
-                  TIT
-                </div>
-                <span className="text-white font-bold">TIT</span>
-              </div>
-              <p className="text-sm">
-                AI-powered tax assistance for South African taxpayers. 
-                Pay less, legally.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
-                <li><Link href="/register" className="hover:text-white transition-colors">Get Started</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-3">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><span className="text-slate-500">Privacy Policy</span></li>
-                <li><span className="text-slate-500">Terms of Service</span></li>
-              </ul>
-              <p className="mt-4 text-xs text-slate-500">
-                Disclaimer: This tool provides tax guidance, not professional tax advice. 
-                Consult a registered tax practitioner for complex matters.
-              </p>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-slate-800 text-center text-sm">
-            © {new Date().getFullYear()} TIT Tax. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <SeoFooter />
     </div>
   );
 }

@@ -178,7 +178,7 @@ export default function DashboardPage() {
               <div className="text-lg sm:text-xl font-bold text-brand-600">
                 {formatZAR(taxYears[0]?.taxWithDeductions ?? 0)}
               </div>
-            </div>
+            </div> 
             <div className="card">
               <div className="text-sm text-slate-500 mb-1">Tax Saved</div>
               <div className="text-lg sm:text-xl font-bold text-brand-600">

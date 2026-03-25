@@ -3,6 +3,21 @@ const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.taxationistheft.co.za',
+          },
+        ],
+        destination: 'https://taxationistheft.co.za/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

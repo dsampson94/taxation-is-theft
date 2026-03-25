@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /tax-help/
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /upload
+Disallow: /transactions
+Disallow: /report
+Disallow: /tax-profile
+Disallow: /payments/
+
+Sitemap: https://taxationistheft.co.za/sitemap.xml

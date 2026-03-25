@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tit-tax-v1';
+const CACHE_NAME = 'tit-tax-v2';
 const STATIC_ASSETS = [
   '/',
   '/dashboard',
@@ -6,6 +6,8 @@ const STATIC_ASSETS = [
   '/register',
   '/manifest.json',
   '/favicon.svg',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -29,13 +31,29 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET and API requests
   if (request.method !== 'GET' || request.url.includes('/api/')) return;
 
+  // For navigation requests, try network first then fall back to cache
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          return response;
+        })
+        .catch(() => caches.match(request).then((r) => r || caches.match('/')))
+    );
+    return;
+  }
+
+  // For static assets, use stale-while-revalidate
   event.respondWith(
-    fetch(request)
-      .then((response) => {
+    caches.match(request).then((cached) => {
+      const fetched = fetch(request).then((response) => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         return response;
-      })
-      .catch(() => caches.match(request))
+      });
+      return cached || fetched;
+    })
   );
 });

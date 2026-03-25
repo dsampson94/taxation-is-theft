@@ -12,8 +12,14 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const siteUrl = "https://taxationistheft.co.za";
+
 export const metadata: Metadata = {
-  title: "TIT | AI-Powered Tax Assistant for South Africans",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "TIT | AI-Powered Tax Assistant for South Africans",
+    template: "%s | TIT Tax",
+  },
   description:
     "Upload your bank statements, let AI find your deductions, and pay the least tax legally possible. Built for South African taxpayers.",
   keywords: [
@@ -23,8 +29,64 @@ export const metadata: Metadata = {
     "bank statement analysis",
     "personal income tax",
     "tax calculator",
+    "South African tax return",
+    "SARS tax filing",
+    "tax refund South Africa",
+    "AI tax assistant",
+    "tax deductions South Africa",
+    "income tax calculator South Africa",
+    "SARS eFiling helper",
+    "freelancer tax South Africa",
+    "home office deduction SARS",
+    "medical tax credits South Africa",
+    "tax help Johannesburg",
+    "tax assistant Cape Town",
+    "tax deductions Durban",
+    "SARS help Pretoria",
+    "tax consultant Sandton",
+    "income tax Gauteng",
+    "tax return Western Cape",
+    "tax filing KwaZulu-Natal",
   ],
   manifest: "/manifest.json",
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_ZA",
+    url: siteUrl,
+    siteName: "TIT Tax",
+    title: "TIT | AI-Powered Tax Assistant for South Africans",
+    description:
+      "Upload your bank statements, let AI find your deductions, and pay the least tax legally possible.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "TIT Tax — AI-Powered Tax Assistant for South Africans",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TIT | AI-Powered Tax Assistant for South Africans",
+    description:
+      "Upload your bank statements, let AI find your deductions, and pay the least tax legally possible.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -33,6 +95,7 @@ export const metadata: Metadata = {
   other: {
     "mobile-web-app-capable": "yes",
   },
+  category: "finance",
 };
 
 export default function RootLayout({
@@ -67,6 +130,35 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "TIT Tax",
+              url: siteUrl,
+              description:
+                "AI-powered tax assistant for South African taxpayers. Upload bank statements, find deductions, pay the least tax legally possible.",
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Web",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "ZAR",
+                description: "1 free trial analysis",
+              },
+              aggregateRating: undefined,
+              featureList: [
+                "AI-powered bank statement analysis",
+                "Automatic tax deduction identification",
+                "SARS-compliant tax reports",
+                "Support for all major South African banks",
+                "Profession-specific deduction detection",
+              ],
+            }),
+          }}
+        />
         <AuthProvider>
           <Toaster position="top-right" />
           <Navbar />

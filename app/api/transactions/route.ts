@@ -90,3 +90,51 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update transaction' }, { status: 500 });
   }
 }
+
+// DELETE /api/transactions?taxYearId=xxx - Clear all data for a tax year
+export async function DELETE(request: NextRequest) {
+  try {
+    const authUser = await getAuthUser();
+    if (!authUser) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const taxYearId = searchParams.get('taxYearId');
+
+    if (!taxYearId) {
+      return NextResponse.json({ error: 'taxYearId is required' }, { status: 400 });
+    }
+
+    // Verify ownership
+    const taxYear = await prisma.taxYear.findFirst({
+      where: { id: taxYearId, userId: authUser.userId },
+    });
+    if (!taxYear) {
+      return NextResponse.json({ error: 'Tax year not found' }, { status: 404 });
+    }
+
+    // Delete in order: deductions → transactions → statement uploads
+    await prisma.deduction.deleteMany({ where: { userId: authUser.userId, taxYearId } });
+    await prisma.transaction.deleteMany({ where: { userId: authUser.userId, taxYearId } });
+    await prisma.statementUpload.deleteMany({ where: { userId: authUser.userId, taxYearId } });
+
+    // Reset tax year totals
+    await prisma.taxYear.update({
+      where: { id: taxYearId },
+      data: {
+        totalIncome: 0,
+        totalDeductions: 0,
+        taxableIncome: 0,
+        estimatedTax: 0,
+        taxWithDeductions: 0,
+        taxSavings: 0,
+      },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Clear data error:', error);
+    return NextResponse.json({ error: 'Failed to clear data' }, { status: 500 });
+  }
+}

@@ -7,6 +7,48 @@ import { validateAndEnrichAnalysis, type AnalyzedTransaction } from '@/app/lib/d
 export const runtime = 'nodejs';
 export const maxDuration = 300;
 
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** Normalize a statement period string to "Month YYYY" format (e.g. "November 2025") */
+function normalizeMonthLabel(raw: string | null | undefined, transactions?: any[]): string | null {
+  if (!raw && (!transactions || transactions.length === 0)) return null;
+
+  // Try parsing the raw string for month/year
+  if (raw) {
+    // Match patterns like "November 2025", "Nov 2025", "2025-11", "11/2025"
+    for (let i = 0; i < MONTH_NAMES.length; i++) {
+      const full = MONTH_NAMES[i].toLowerCase();
+      const short = full.substring(0, 3);
+      if (raw.toLowerCase().includes(full) || raw.toLowerCase().includes(short)) {
+        const yearMatch = raw.match(/(20\d{2})/);
+        if (yearMatch) return `${MONTH_NAMES[i]} ${yearMatch[1]}`;
+      }
+    }
+    // Try YYYY-MM format
+    const isoMatch = raw.match(/(20\d{2})-(\d{2})/);
+    if (isoMatch) {
+      const monthIdx = parseInt(isoMatch[2]) - 1;
+      if (monthIdx >= 0 && monthIdx < 12) return `${MONTH_NAMES[monthIdx]} ${isoMatch[1]}`;
+    }
+  }
+
+  // Fallback: derive from transaction dates (use most common month)
+  if (transactions && transactions.length > 0) {
+    const monthCounts: Record<string, number> = {};
+    for (const tx of transactions) {
+      const d = new Date(tx.date);
+      if (!isNaN(d.getTime())) {
+        const key = `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
+        monthCounts[key] = (monthCounts[key] || 0) + 1;
+      }
+    }
+    const sorted = Object.entries(monthCounts).sort((a, b) => b[1] - a[1]);
+    if (sorted.length > 0) return sorted[0][0];
+  }
+
+  return raw || null;
+}
+
 export async function POST(request: NextRequest) {
   const authUser = await getAuthUser();
   if (!authUser) {
@@ -126,7 +168,10 @@ export async function POST(request: NextRequest) {
     // If taxYearId provided, save transactions to DB
     let replacedMonth = false;
     if (taxYearId && analysisResult.transactions) {
-      const monthLabel = analysisResult.summary?.statementPeriod || null;
+      const monthLabel = normalizeMonthLabel(
+        analysisResult.summary?.statementPeriod,
+        analysisResult.transactions
+      );
 
       if (monthLabel) {
         const existingUpload = await prisma.statementUpload.findFirst({
@@ -149,7 +194,7 @@ export async function POST(request: NextRequest) {
           fileName: fileName || 'bank-statement.pdf',
           pageCount: pageEstimate,
           fileSize: fileSize || text.length,
-          monthLabel: analysisResult.summary?.statementPeriod || null,
+          monthLabel,
         },
       });
 
@@ -171,7 +216,7 @@ export async function POST(request: NextRequest) {
           deductiblePct: Math.min(100, Math.max(0, tx.deductiblePct || 0)),
           bankName: analysisResult.summary?.bankName || null,
           accountNumber: analysisResult.summary?.accountNumber || null,
-          statementMonth: analysisResult.summary?.statementPeriod || null,
+          statementMonth: monthLabel,
           notes: tx.notes || null,
           flag: ['OBVIOUS', 'LIKELY', 'REVIEW', 'PERSONAL'].includes(tx.flag) ? tx.flag : null,
         }));

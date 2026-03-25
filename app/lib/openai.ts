@@ -55,7 +55,7 @@ Return a JSON object with this structure:
     "totalDeductible": number,
     "bankName": string,
     "accountNumber": string (last 4 digits only),
-    "statementPeriod": string
+    "statementPeriod": string (format: "Month YYYY", e.g. "November 2025")
   }
 }`;
 

@@ -78,6 +78,8 @@ function UploadContent() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [uploadedMonths, setUploadedMonths] = useState<Record<string, { fileName: string; createdAt: string }>>({});
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -138,6 +140,29 @@ function UploadContent() {
       }
     } catch {
       // Profile fetch failure is non-critical
+    }
+  };
+
+  const clearTaxYearData = async () => {
+    if (!taxYearId) return;
+    setClearing(true);
+    try {
+      const res = await fetch(`/api/transactions?taxYearId=${taxYearId}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('All data cleared for this tax year');
+        setUploadedMonths({});
+        setAllAnalyses([]);
+        setFiles([]);
+        fetchTaxYears();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to clear data');
+      }
+    } catch {
+      toast.error('Failed to clear data');
+    } finally {
+      setClearing(false);
+      setShowClearConfirm(false);
     }
   };
 
@@ -396,6 +421,17 @@ function UploadContent() {
                   Re-uploading a month automatically replaces the previous data — no duplicates.
                 </p>
               )}
+              {uploadedCount > 0 && (
+                <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                  <button
+                    onClick={() => setShowClearConfirm(true)}
+                    className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1"
+                  >
+                    <Trash2 size={12} />
+                    Clear all data for this tax year
+                  </button>
+                </div>
+              )}
             </div>
           );
         })()}
@@ -419,7 +455,10 @@ function UploadContent() {
                 Drag & drop bank statement PDFs here
               </p>
               <p className="text-sm text-slate-500">
-                or click to browse • Supports FNB, Standard Bank, Nedbank, Absa, Capitec & more • Max 10MB per file
+                or click to browse • Max 10MB per file
+              </p>
+              <p className="text-xs text-brand-600 mt-2 font-medium">
+                Upload cheque/salary statements first, then credit cards
               </p>
             </>
           )}
@@ -446,25 +485,36 @@ function UploadContent() {
                   <ul className="list-disc ml-4 space-y-1 text-xs">
                     <li><strong>12 months</strong> of bank statement PDFs (March–February for one tax year)</li>
                     <li>Download from your bank&apos;s online banking &rarr; Statements &rarr; PDF</li>
-                    <li>Credit card statements too, if you have business expenses on them</li>
+                    <li>Include <strong>all accounts</strong>: cheque, savings, and credit cards</li>
                   </ul>
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-white mb-1">Upload order (important!)</p>
+                  <ol className="list-decimal ml-4 space-y-1 text-xs">
+                    <li><strong className="text-brand-700 dark:text-brand-300">Cheque / salary account first</strong> — this captures your income</li>
+                    <li><strong>Credit card statements next</strong> — these capture business expenses</li>
+                    <li>Savings accounts last (if applicable)</li>
+                  </ol>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Your salary/income must be uploaded for the tax report to calculate savings correctly.
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium text-slate-900 dark:text-white mb-1">Step by step</p>
                   <ol className="list-decimal ml-4 space-y-1 text-xs">
                     <li>Select your tax year above</li>
-                    <li>Drag &amp; drop all your PDF statements into the upload area</li>
+                    <li>Upload cheque account statements first (one per month)</li>
+                    <li>Then upload credit card statements</li>
                     <li>Click &quot;Analyze All with AI&quot; — each statement uses 1 credit</li>
-                    <li>Review flagged transactions on the Transactions page</li>
-                    <li>Generate your Tax Report to see your total savings</li>
+                    <li>Review flagged transactions, then generate your Tax Report</li>
                   </ol>
                 </div>
                 <div>
-                  <p className="font-medium text-slate-900 dark:text-white mb-1">Tips for best results</p>
+                  <p className="font-medium text-slate-900 dark:text-white mb-1">Tips</p>
                   <ul className="list-disc ml-4 space-y-1 text-xs">
-                    <li>Upload one month per PDF (most banks allow this)</li>
-                    <li>Complete your <Link href="/tax-profile" className="text-brand-600 hover:underline">tax profile</Link> first — it makes AI much more accurate</li>
-                    <li>FNB, Standard Bank, Nedbank, Absa, Capitec, Investec &amp; Discovery Bank all supported</li>
+                    <li>Upload one month per PDF for best results</li>
+                    <li>Re-uploading a month replaces the old data — no duplicates</li>
+                    <li>FNB, Standard Bank, Nedbank, Absa, Capitec, Investec &amp; Discovery Bank supported</li>
                   </ul>
                 </div>
               </div>
@@ -637,6 +687,42 @@ function UploadContent() {
         )}
       </div>
       </div>
+
+      {/* Clear data confirmation modal */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <Trash2 size={20} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Clear Tax Year Data</h3>
+                <p className="text-xs text-slate-500">This action cannot be undone</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-6">
+              Are you sure you want to delete <strong>all transactions, deductions, and upload records</strong> for this tax year?
+              You will need to re-upload and re-analyze your statements.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowClearConfirm(false)}
+                className="px-4 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={clearTaxYearData}
+                disabled={clearing}
+                className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {clearing ? 'Clearing...' : 'Yes, clear all data'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

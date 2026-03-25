@@ -1,12 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 import Link from 'next/link';
 import { CheckCircle, ArrowRight, Clock, XCircle, RefreshCw } from 'lucide-react';
 
 export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+          <div className="card max-w-md w-full text-center">
+            <RefreshCw className="mx-auto text-brand-500 mb-4 animate-spin" size={64} />
+            <h1 className="text-2xl font-bold mb-2">Verifying Payment...</h1>
+          </div>
+        </div>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
+  );
+}
+
+function PaymentSuccessContent() {
   const { refreshUser } = useAuth();
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('payment_id');

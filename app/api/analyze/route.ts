@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { text, occupation, taxYearId, fileName, fileSize } = await request.json();
+  const { text, occupation, taxYearId, fileName, fileSize, selectedMonth } = await request.json();
   if (!text || text.length < 50) {
     return NextResponse.json({ error: 'Statement text too short or empty' }, { status: 400 });
   }
@@ -168,7 +168,8 @@ export async function POST(request: NextRequest) {
     // If taxYearId provided, save transactions to DB
     let replacedMonth = false;
     if (taxYearId && analysisResult.transactions) {
-      const monthLabel = normalizeMonthLabel(
+      // User-selected month takes priority, then AI detection, then transaction date fallback
+      const monthLabel = selectedMonth || normalizeMonthLabel(
         analysisResult.summary?.statementPeriod,
         analysisResult.transactions
       );

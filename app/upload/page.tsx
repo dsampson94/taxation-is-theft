@@ -39,6 +39,7 @@ interface UploadedFile {
   pages?: number;
   analysis?: any;
   error?: string;
+  selectedMonth?: string; // User-confirmed month label e.g. "November 2025"
 }
 
 const formatZAR = (amount: number) =>
@@ -60,6 +61,33 @@ function getTaxYearMonths(yearLabel: string): { label: string; short: string }[]
   months.push({ label: `${MONTH_NAMES[0]} ${endYear}`, short: `${MONTH_SHORT[0]} ${endYear}` }); // Jan
   months.push({ label: `${MONTH_NAMES[1]} ${endYear}`, short: `${MONTH_SHORT[1]} ${endYear}` }); // Feb
   return months;
+}
+
+/** Try to detect the month from a PDF filename like "FNB_November_2025.pdf" or "statement-2025-11.pdf" */
+function detectMonthFromFilename(filename: string): string | null {
+  const lower = filename.toLowerCase();
+  // Try full/short month names
+  for (let i = 0; i < MONTH_NAMES.length; i++) {
+    const full = MONTH_NAMES[i].toLowerCase();
+    const short = MONTH_SHORT[i].toLowerCase();
+    if (lower.includes(full) || new RegExp(`\\b${short}\\b`).test(lower)) {
+      const yearMatch = filename.match(/(20\d{2})/);
+      if (yearMatch) return `${MONTH_NAMES[i]} ${yearMatch[1]}`;
+    }
+  }
+  // Try YYYY-MM or YYYY_MM patterns
+  const isoMatch = filename.match(/(20\d{2})[-_](\d{2})/);
+  if (isoMatch) {
+    const idx = parseInt(isoMatch[2]) - 1;
+    if (idx >= 0 && idx < 12) return `${MONTH_NAMES[idx]} ${isoMatch[1]}`;
+  }
+  // Try MM-YYYY or MM_YYYY
+  const reverseMatch = filename.match(/(\d{2})[-_](20\d{2})/);
+  if (reverseMatch) {
+    const idx = parseInt(reverseMatch[1]) - 1;
+    if (idx >= 0 && idx < 12) return `${MONTH_NAMES[idx]} ${reverseMatch[2]}`;
+  }
+  return null;
 }
 
 function UploadContent() {
@@ -171,7 +199,11 @@ function UploadContent() {
     if (pdfFiles.length < acceptedFiles.length) {
       toast.error('Only PDF files are accepted');
     }
-    const newFiles: UploadedFile[] = pdfFiles.map(file => ({ file, status: 'pending' }));
+    const newFiles: UploadedFile[] = pdfFiles.map(file => ({
+      file,
+      status: 'pending',
+      selectedMonth: detectMonthFromFilename(file.name) || '',
+    }));
     setFiles(prev => [...prev, ...newFiles]);
   }, []);
 
@@ -223,6 +255,14 @@ function UploadContent() {
       return;
     }
 
+    // Validate all files have a month selected
+    const pendingFiles = files.filter(f => f.status !== 'done' && f.status !== 'error');
+    const missingMonth = pendingFiles.find(f => !f.selectedMonth);
+    if (missingMonth) {
+      toast.error(`Please select a month for "${missingMonth.file.name}"`);
+      return;
+    }
+
     setAnalyzing(true);
     const results: any[] = [];
 
@@ -246,7 +286,14 @@ function UploadContent() {
         const res = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, occupation, taxYearId, fileName: f.file.name, fileSize: f.file.size }),
+          body: JSON.stringify({
+            text,
+            occupation,
+            taxYearId,
+            fileName: f.file.name,
+            fileSize: f.file.size,
+            selectedMonth: f.selectedMonth,
+          }),
         });
 
         const data = await res.json();
@@ -589,54 +636,86 @@ function UploadContent() {
             </div>
 
             <div className="space-y-3">
-              {files.map((f, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
-                  <FileText size={20} className="text-slate-400 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{f.file.name}</p>
-                    <p className="text-xs text-slate-500">
-                      {(f.file.size / 1024).toFixed(0)} KB
-                      {f.pages ? ` • ${f.pages} pages` : ''}
-                    </p>
+              {files.map((f, i) => {
+                const ty = taxYears.find((t: any) => t.id === taxYearId);
+                const months = ty ? getTaxYearMonths(ty.yearLabel) : [];
+                return (
+                <div key={i} className="flex flex-col gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <div className="flex items-center gap-3">
+                    <FileText size={20} className="text-slate-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{f.file.name}</p>
+                      <p className="text-xs text-slate-500">
+                        {(f.file.size / 1024).toFixed(0)} KB
+                        {f.pages ? ` • ${f.pages} pages` : ''}
+                      </p>
+                    </div>
+                    <div className="shrink-0">
+                      {f.status === 'pending' && (
+                        <span className="text-xs text-slate-400">Ready</span>
+                      )}
+                      {f.status === 'parsing' && (
+                        <Loader2 size={16} className="text-blue-500 animate-spin" />
+                      )}
+                      {f.status === 'parsed' && (
+                        <span className="text-xs text-blue-500">Parsed</span>
+                      )}
+                      {f.status === 'analyzing' && (
+                        <div className="flex items-center gap-1">
+                          <Loader2 size={16} className="text-brand-500 animate-spin" />
+                          <span className="text-xs text-brand-500">{(f as any).statusMessage || 'AI analyzing...'}</span>
+                        </div>
+                      )}
+                      {f.status === 'done' && (
+                        <CheckCircle size={16} className="text-brand-500" />
+                      )}
+                      {f.status === 'error' && (
+                        <div className="flex items-center gap-1">
+                          <AlertCircle size={16} className="text-red-500" />
+                          <span className="text-xs text-red-500 max-w-[150px] truncate">
+                            {f.error}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {f.status !== 'analyzing' && f.status !== 'parsing' && (
+                      <button
+                        onClick={() => removeFile(i)}
+                        className="text-slate-400 hover:text-red-500 shrink-0"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </div>
-                  <div className="shrink-0">
-                    {f.status === 'pending' && (
-                      <span className="text-xs text-slate-400">Ready</span>
-                    )}
-                    {f.status === 'parsing' && (
-                      <Loader2 size={16} className="text-blue-500 animate-spin" />
-                    )}
-                    {f.status === 'parsed' && (
-                      <span className="text-xs text-blue-500">Parsed</span>
-                    )}
-                    {f.status === 'analyzing' && (
-                      <div className="flex items-center gap-1">
-                        <Loader2 size={16} className="text-brand-500 animate-spin" />
-                        <span className="text-xs text-brand-500">{(f as any).statusMessage || 'AI analyzing...'}</span>
-                      </div>
-                    )}
-                    {f.status === 'done' && (
-                      <CheckCircle size={16} className="text-brand-500" />
-                    )}
-                    {f.status === 'error' && (
-                      <div className="flex items-center gap-1">
-                        <AlertCircle size={16} className="text-red-500" />
-                        <span className="text-xs text-red-500 max-w-[150px] truncate">
-                          {f.error}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  {f.status !== 'analyzing' && f.status !== 'parsing' && (
-                    <button
-                      onClick={() => removeFile(i)}
-                      className="text-slate-400 hover:text-red-500 shrink-0"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                  {/* Month selector row */}
+                  {f.status !== 'done' && months.length > 0 && (
+                    <div className="flex items-center gap-2 ml-8">
+                      <Calendar size={14} className="text-slate-400 shrink-0" />
+                      <select
+                        value={f.selectedMonth || ''}
+                        onChange={e => {
+                          const val = e.target.value;
+                          setFiles(prev => prev.map((file, idx) =>
+                            idx === i ? { ...file, selectedMonth: val } : file
+                          ));
+                        }}
+                        className="input py-1 px-2 text-xs flex-1 max-w-[200px]"
+                      >
+                        <option value="">Select month...</option>
+                        {months.map(m => (
+                          <option key={m.label} value={m.label}>{m.label}</option>
+                        ))}
+                      </select>
+                      {f.selectedMonth ? (
+                        <span className="text-xs text-brand-600 font-medium">{f.selectedMonth.split(' ')[0]}</span>
+                      ) : (
+                        <span className="text-xs text-amber-500">⚠ Please select</span>
+                      )}
+                    </div>
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

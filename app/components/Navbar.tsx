@@ -91,7 +91,7 @@ export default function Navbar() {
                 </div>
               </>
             ) : (
-              <>
+              <div className="flex items-center gap-4">
                 {!isLanding && (
                   <Link href="/" className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300">
                     Home
@@ -113,7 +113,7 @@ export default function Navbar() {
                 <Link href="/register" className="btn-primary text-sm py-2 px-4">
                   Get Started Free
                 </Link>
-              </>
+              </div>
             )}
           </div>
 

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
+import SwipeNav from "./components/SwipeNav";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -162,7 +163,9 @@ export default function RootLayout({
         <AuthProvider>
           <Toaster position="top-right" />
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <SwipeNav>
+            <main className="flex-1">{children}</main>
+          </SwipeNav>
           <Analytics />
           <SpeedInsights />
         </AuthProvider>

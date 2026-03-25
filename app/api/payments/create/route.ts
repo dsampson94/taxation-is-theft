@@ -43,7 +43,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Determine base URL: prefer env var, fall back to request origin
+    // PayFast rejects localhost and HTTP URLs in production
+    const envUrl = process.env.NEXT_PUBLIC_APP_URL;
+    const origin = req.headers.get('origin') || req.headers.get('referer')?.replace(/\/[^/]*$/, '') || '';
+    let baseUrl = envUrl || origin || '';
+    baseUrl = baseUrl.replace(/\/$/, '');
+
+    if (!baseUrl || (!PAYFAST_CONFIG.sandbox && (!baseUrl.startsWith('https://') || baseUrl.includes('localhost')))) {
+      console.error('Invalid base URL for PayFast:', baseUrl);
+      return NextResponse.json(
+        { error: 'Payment configuration error. Please contact support.' },
+        { status: 500 }
+      );
+    }
 
     // Build PayFast form data
     const pfData: Record<string, string> = {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const protectedRoutes = ['/dashboard', '/upload', '/report', '/transactions', '/tax-profile'];
+const protectedRoutes = ['/dashboard', '/upload', '/report', '/transactions', '/tax-profile', '/admin'];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth-token')?.value;
@@ -22,5 +22,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/upload/:path*', '/report/:path*', '/transactions/:path*', '/tax-profile/:path*', '/login', '/register'],
+  matcher: ['/dashboard/:path*', '/upload/:path*', '/report/:path*', '/transactions/:path*', '/tax-profile/:path*', '/admin/:path*', '/login', '/register'],
 };

@@ -22,8 +22,8 @@ const PLANS = [
     id: 'single',
     name: 'Single Analysis',
     credits: 1,
-    price: 49,
-    perCredit: '49.00',
+    price: 43,
+    perCredit: '43.00',
     popular: false,
     icon: Zap,
     color: 'border-slate-200 dark:border-slate-700',
@@ -40,8 +40,8 @@ const PLANS = [
     id: 'tax-year',
     name: 'Tax Year Pack',
     credits: 12,
-    price: 375,
-    perCredit: '31.25',
+    price: 330,
+    perCredit: '27.50',
     popular: true,
     icon: Crown,
     color: 'border-brand-500 ring-2 ring-brand-500/20',
@@ -61,8 +61,8 @@ const PLANS = [
     id: 'full-coverage',
     name: 'Full Coverage',
     credits: 24,
-    price: 599,
-    perCredit: '24.96',
+    price: 527,
+    perCredit: '21.96',
     popular: false,
     icon: Sparkles,
     color: 'border-slate-200 dark:border-slate-700',
@@ -220,7 +220,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-bold mb-2">Why are we so much cheaper than a tax practitioner?</h3>
               <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
                 A registered tax consultant charges <strong>R2,000–R5,000+</strong> to prepare your return.
-                TIT gives you detailed, AI-powered deduction analysis for a full tax year at <strong>R375</strong> — that&apos;s
+                TIT gives you detailed, AI-powered deduction analysis for a full tax year at <strong>R330</strong> — that&apos;s
                 up to <strong>90% less</strong>. Our AI costs us less than R2 per analysis, so we pass the savings to you.
               </p>
             </div>

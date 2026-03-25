@@ -2,18 +2,19 @@
 // PayFast is the go-to SA payment gateway (supports EFT, card, SnapScan, etc.)
 
 // Cost breakdown per analysis (GPT-4o):
-//   Input: ~8,000 tokens × $2.50/1M = $0.02
-//   Output: ~4,000 tokens × $10.00/1M = $0.04
-//   Total: ~$0.06 per analysis (~R1.14 at R19/$)
-// Margin: 96-98% depending on plan
+//   Input: ~15,000 tokens × $2.50/1M = $0.04
+//   Output: ~8,000 tokens × $10.00/1M = $0.08
+//   Total: ~$0.12 per analysis (~R2.28 at R19/$)
+//   With chunking (large statements, 2 calls): ~$0.24 (~R4.56)
+// Margin: 89-95% depending on plan and statement size
 
 export const CREDIT_PLANS = [
   {
     id: 'single',
     name: 'Single Analysis',
     credits: 1,
-    priceZAR: 49,
-    pricePerCredit: 49,
+    priceZAR: 43,
+    pricePerCredit: 43,
     popular: false,
     description: 'Analyze one bank statement',
     features: [
@@ -27,8 +28,8 @@ export const CREDIT_PLANS = [
     id: 'tax-year',
     name: 'Tax Year Pack',
     credits: 12,
-    priceZAR: 375,
-    pricePerCredit: 31.25,
+    priceZAR: 330,
+    pricePerCredit: 27.50,
     popular: true,
     description: 'Complete tax year — best value',
     features: [
@@ -44,8 +45,8 @@ export const CREDIT_PLANS = [
     id: 'full-coverage',
     name: 'Full Coverage',
     credits: 24,
-    priceZAR: 599,
-    pricePerCredit: 24.96,
+    priceZAR: 527,
+    pricePerCredit: 21.96,
     popular: false,
     description: 'Bank + credit card for the year',
     features: [

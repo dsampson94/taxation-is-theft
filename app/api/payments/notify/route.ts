@@ -73,7 +73,16 @@ export async function POST(req: NextRequest) {
     const pfStatus = data.payment_status;
 
     if (pfStatus === 'COMPLETE' && payment.status === 'PENDING') {
-      // Credit the user's account
+      // Idempotency: check if this PayFast payment ID was already processed
+      const existing = await prisma.payment.findFirst({
+        where: { externalId: data.pf_payment_id, status: 'COMPLETED' },
+      });
+      if (existing) {
+        console.log(`ITN duplicate ignored: pf_payment_id=${data.pf_payment_id}`);
+        return new NextResponse('OK', { status: 200 });
+      }
+
+      // Credit the user's account atomically
       await prisma.$transaction([
         prisma.payment.update({
           where: { id: paymentId },

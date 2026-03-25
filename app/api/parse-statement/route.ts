@@ -43,12 +43,41 @@ export async function POST(request: NextRequest) {
     if (pdf.Pages) {
       pdf.Pages.forEach((page: any) => {
         if (page.Texts) {
-          page.Texts.forEach((text: any) => {
-            text.R.forEach((run: any) => {
-              fullText += decodeURIComponent(run.T) + ' ';
-            });
+          // Sort text elements by Y position (row), then X position (column)
+          // This preserves table structure in SA bank statement PDFs
+          const sortedTexts = [...page.Texts].sort((a: any, b: any) => {
+            const yDiff = (a.y || 0) - (b.y || 0);
+            // Treat items within 0.5 units of Y as same row
+            if (Math.abs(yDiff) < 0.5) return (a.x || 0) - (b.x || 0);
+            return yDiff;
           });
-          fullText += '\n';
+
+          let lastY = -1;
+          let lastX = -1;
+          sortedTexts.forEach((text: any) => {
+            const y = text.y || 0;
+            const x = text.x || 0;
+
+            // New row — add newline
+            if (lastY >= 0 && Math.abs(y - lastY) >= 0.5) {
+              fullText += '\n';
+              lastX = -1;
+            }
+
+            // Column gap — add tab separator to preserve table columns
+            if (lastX >= 0 && (x - lastX) > 2) {
+              fullText += '\t';
+            }
+
+            text.R.forEach((run: any) => {
+              fullText += decodeURIComponent(run.T);
+            });
+            fullText += ' ';
+
+            lastY = y;
+            lastX = x + (text.w || 0);
+          });
+          fullText += '\n\n'; // Page break
         }
       });
     }

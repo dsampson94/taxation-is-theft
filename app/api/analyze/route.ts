@@ -9,6 +9,68 @@ export const maxDuration = 300;
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+/** Split statement text into chunks at natural boundaries (double newlines / page breaks) */
+function splitStatementIntoChunks(text: string, maxChunkSize: number): string[] {
+  if (text.length <= maxChunkSize) return [text];
+
+  const chunks: string[] = [];
+  let remaining = text;
+
+  while (remaining.length > 0) {
+    if (remaining.length <= maxChunkSize) {
+      chunks.push(remaining);
+      break;
+    }
+
+    // Try to find a natural break (double newline, then single newline)
+    let breakPoint = remaining.lastIndexOf('\n\n', maxChunkSize);
+    if (breakPoint < maxChunkSize * 0.5) {
+      breakPoint = remaining.lastIndexOf('\n', maxChunkSize);
+    }
+    if (breakPoint < maxChunkSize * 0.3) {
+      breakPoint = maxChunkSize;
+    }
+
+    chunks.push(remaining.substring(0, breakPoint));
+    remaining = remaining.substring(breakPoint).trimStart();
+  }
+
+  return chunks;
+}
+
+/** Merge analysis results from multiple chunks into a single result */
+function mergeChunkResults(results: any[]): any {
+  if (results.length === 1) return results[0];
+
+  const allTransactions = results.flatMap(r => r.transactions || []);
+
+  // Deduplicate transactions with same date + description + amount
+  const seen = new Set<string>();
+  const deduped = allTransactions.filter((tx: any) => {
+    const key = `${tx.date}|${tx.description}|${tx.amount}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // Recompute summary from merged transactions
+  const income = deduped.filter((t: any) => t.type === 'INCOME');
+  const expenses = deduped.filter((t: any) => t.type === 'EXPENSE');
+  const deductible = deduped.filter((t: any) => t.isDeductible);
+
+  const baseSummary = results[0]?.summary || {};
+
+  return {
+    transactions: deduped,
+    summary: {
+      ...baseSummary,
+      totalIncome: income.reduce((s: number, t: any) => s + Math.abs(t.amount), 0),
+      totalExpenses: expenses.reduce((s: number, t: any) => s + Math.abs(t.amount), 0),
+      totalDeductible: deductible.reduce((s: number, t: any) => s + (Math.abs(t.amount) * (t.deductiblePct || 0) / 100), 0),
+    },
+  };
+}
+
 /** Normalize a statement period string to "Month YYYY" format (e.g. "November 2025") */
 function normalizeMonthLabel(raw: string | null | undefined, transactions?: any[]): string | null {
   if (!raw && (!transactions || transactions.length === 0)) return null;
@@ -93,33 +155,55 @@ export async function POST(request: NextRequest) {
       prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);
     }
 
-    const truncatedText = text.length > 50000
-      ? text.substring(0, 50000) + '\n[TRUNCATED — upload shorter statement periods for best results]'
+    // GPT-4o supports 128K context — allow up to ~120K chars input (~30K tokens)
+    const maxInputChars = 120000;
+    const safeText = text.length > maxInputChars
+      ? text.substring(0, maxInputChars) + '\n[TRUNCATED — upload shorter statement periods for best results]'
       : text;
 
-    // Call OpenAI (non-streaming for simplicity — maxDuration=300 prevents timeout)
-    const completion = await getOpenAI().chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: prompt },
-        { role: 'user', content: `Here is the bank statement text to analyze:\n\n${truncatedText}` },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.1,
-      max_tokens: 8000,
+    // ═══ CHUNKING: Split large statements to avoid output token limits ═══
+    // GPT-4o max output is 16,384 tokens. Each transaction ≈ 130 tokens in JSON.
+    // Safe limit: ~100 transactions per chunk. Split at ~40K chars per chunk.
+    const CHUNK_SIZE = 40000;
+    const chunks = splitStatementIntoChunks(safeText, CHUNK_SIZE);
+    const openai = getOpenAI();
+    const model = process.env.OPENAI_MODEL || 'gpt-4o';
+
+    // Fire all chunks in parallel — OpenAI handles concurrent requests fine
+    const chunkPromises = chunks.map((chunk, i) => {
+      const chunkLabel = chunks.length > 1
+        ? `\n\n[Part ${i + 1} of ${chunks.length} — extract ALL transactions from this section]`
+        : '';
+
+      return openai.chat.completions.create({
+        model,
+        messages: [
+          { role: 'system', content: prompt },
+          { role: 'user', content: `Here is the bank statement text to analyze:\n\n${chunk}${chunkLabel}` },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.1,
+        max_tokens: 16384,
+      });
     });
 
-    const resultText = completion.choices[0]?.message?.content;
-    if (!resultText) {
-      return NextResponse.json({ error: 'AI did not return a response' }, { status: 500 });
+    const completions = await Promise.all(chunkPromises);
+
+    const chunkResults: any[] = [];
+    for (let i = 0; i < completions.length; i++) {
+      const resultText = completions[i].choices[0]?.message?.content;
+      if (!resultText) {
+        return NextResponse.json({ error: `AI did not return a response (chunk ${i + 1})` }, { status: 500 });
+      }
+      try {
+        chunkResults.push(JSON.parse(resultText));
+      } catch {
+        return NextResponse.json({ error: `AI returned invalid JSON (chunk ${i + 1})` }, { status: 500 });
+      }
     }
 
-    let analysisResult;
-    try {
-      analysisResult = JSON.parse(resultText);
-    } catch {
-      return NextResponse.json({ error: 'AI returned invalid JSON' }, { status: 500 });
-    }
+    // Merge chunk results
+    const analysisResult = mergeChunkResults(chunkResults);
 
     // ═══ PASS 2: Rules Engine Validation ═══
     if (analysisResult.transactions && Array.isArray(analysisResult.transactions)) {

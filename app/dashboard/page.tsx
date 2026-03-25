@@ -13,11 +13,8 @@ import {
   Calendar,
   CreditCard,
   BarChart3,
-  Settings,
   Sparkles,
   Lock,
-  ChevronDown,
-  Info,
 } from 'lucide-react';
 
 interface TaxYear {

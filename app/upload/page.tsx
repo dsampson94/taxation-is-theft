@@ -239,7 +239,7 @@ function UploadContent() {
         text = parsed;
       }
 
-      // Analyze via SSE stream (avoids Vercel 60s timeout)
+      // Analyze statement
       setFiles(prev => prev.map((file, idx) => idx === i ? { ...file, status: 'analyzing' } : file));
 
       try {

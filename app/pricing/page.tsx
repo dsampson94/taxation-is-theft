@@ -22,8 +22,8 @@ const PLANS = [
     id: 'single',
     name: 'Single Analysis',
     credits: 1,
-    price: 69,
-    perCredit: '69.00',
+    price: 49,
+    perCredit: '49.00',
     popular: false,
     icon: Zap,
     color: 'border-slate-200 dark:border-slate-700',
@@ -40,14 +40,14 @@ const PLANS = [
     id: 'tax-year',
     name: 'Tax Year Pack',
     credits: 12,
-    price: 499,
-    perCredit: '41.58',
+    price: 375,
+    perCredit: '31.25',
     popular: true,
     icon: Crown,
     color: 'border-brand-500 ring-2 ring-brand-500/20',
     btnClass: 'btn-primary',
     description: 'Complete tax year — best value',
-    badge: 'SAVE 40%',
+    badge: 'SAVE 36%',
     features: [
       '12 statement analyses',
       'Full tax year coverage (Mar–Feb)',
@@ -61,14 +61,14 @@ const PLANS = [
     id: 'full-coverage',
     name: 'Full Coverage',
     credits: 24,
-    price: 799,
-    perCredit: '33.29',
+    price: 599,
+    perCredit: '24.96',
     popular: false,
     icon: Sparkles,
     color: 'border-slate-200 dark:border-slate-700',
     btnClass: 'btn-primary',
     description: 'Bank + credit card for the year',
-    badge: 'SAVE 52%',
+    badge: 'SAVE 49%',
     features: [
       '24 statement analyses',
       'Bank account + credit card coverage',
@@ -220,7 +220,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-bold mb-2">Why are we so much cheaper than a tax practitioner?</h3>
               <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
                 A registered tax consultant charges <strong>R2,000–R5,000+</strong> to prepare your return.
-                TIT gives you detailed, AI-powered deduction analysis for a full tax year at <strong>R499</strong> — that&apos;s
+                TIT gives you detailed, AI-powered deduction analysis for a full tax year at <strong>R375</strong> — that&apos;s
                 up to <strong>90% less</strong>. Our AI costs us less than R2 per analysis, so we pass the savings to you.
               </p>
             </div>

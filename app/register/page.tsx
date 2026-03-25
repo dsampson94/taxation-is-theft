@@ -92,7 +92,7 @@ export default function RegisterPage() {
           </form>
 
           <p className="mt-4 text-center text-xs text-slate-400">
-            3 free statement analyses included. No credit card required.
+            1 free trial analysis included. No credit card required.
           </p>
 
           <p className="mt-4 text-center text-sm text-slate-500">

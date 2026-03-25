@@ -12,6 +12,8 @@ import {
   Edit3,
   Save,
   Filter,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { ZA_EXPENSE_CATEGORIES } from '@/app/lib/tax-rates-za';
 
@@ -33,6 +35,7 @@ interface Transaction {
   bankName: string | null;
   userOverride: boolean;
   flag: string | null;
+  statementMonth: string | null;
 }
 
 export default function TransactionsPage() {
@@ -57,6 +60,7 @@ function TransactionsContent() {
   const [filter, setFilter] = useState<'all' | 'income' | 'expense' | 'deductible' | 'review'>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>({});
+  const [collapsedMonths, setCollapsedMonths] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -204,7 +208,7 @@ function TransactionsContent() {
           </div>
         )}
 
-        {/* Transactions table */}
+        {/* Transactions grouped by month */}
         {loading ? (
           <div className="card text-center py-12 text-slate-400">Loading transactions...</div>
         ) : filtered.length === 0 ? (
@@ -216,103 +220,165 @@ function TransactionsContent() {
               Upload Statements
             </Link>
           </div>
-        ) : (
-          <div className="card overflow-x-auto p-0">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                  <th className="text-left py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Date</th>
-                  <th className="text-left py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Description</th>
-                  <th className="text-right py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Amount</th>
-                  <th className="text-left py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm hidden sm:table-cell">Category</th>
-                  <th className="text-center py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm hidden sm:table-cell">Deductible</th>
-                  <th className="text-center py-3 px-3 sm:px-4 font-medium text-slate-500 text-xs sm:text-sm">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(tx => (
-                  <tr key={tx.id} className="border-b border-slate-100 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td className="py-2.5 px-3 sm:px-4 whitespace-nowrap text-slate-500 text-xs sm:text-sm">
-                      {new Date(tx.date).toLocaleDateString('en-ZA')}
-                    </td>
-                    <td className="py-2.5 px-3 sm:px-4 max-w-[150px] sm:max-w-[250px] truncate text-xs sm:text-sm" title={tx.description}>
-                      <div className="flex items-center gap-1.5">
-                        {tx.flag === 'OBVIOUS' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-brand-500" title="Obvious deduction" />}
-                        {tx.flag === 'LIKELY' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-blue-500" title="Likely deduction" />}
-                        {tx.flag === 'REVIEW' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-amber-500" title="Needs review" />}
-                        {tx.flag === 'PERSONAL' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-slate-300" title="Personal expense" />}
-                        <span className="truncate">{tx.description}</span>
+        ) : (() => {
+          // Group transactions by month
+          const groups: Record<string, Transaction[]> = {};
+          for (const tx of filtered) {
+            const key = tx.statementMonth || new Date(tx.date).toISOString().substring(0, 7);
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(tx);
+          }
+          const sortedKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+
+          const toggleMonth = (key: string) => {
+            setCollapsedMonths(prev => {
+              const next = new Set(prev);
+              if (next.has(key)) next.delete(key);
+              else next.add(key);
+              return next;
+            });
+          };
+
+          const collapseAll = () => setCollapsedMonths(new Set(sortedKeys));
+          const expandAll = () => setCollapsedMonths(new Set());
+
+          return (
+            <div className="space-y-3">
+              <div className="flex justify-end gap-2">
+                <button onClick={expandAll} className="text-xs text-brand-600 hover:underline">Expand all</button>
+                <span className="text-xs text-slate-300">|</span>
+                <button onClick={collapseAll} className="text-xs text-brand-600 hover:underline">Collapse all</button>
+              </div>
+              {sortedKeys.map(monthKey => {
+                const txs = groups[monthKey];
+                const isCollapsed = collapsedMonths.has(monthKey);
+                const monthExpenses = txs.filter(t => t.type === 'EXPENSE').reduce((s, t) => s + Math.abs(Number(t.amount)), 0);
+                const monthIncome = txs.filter(t => t.type === 'INCOME').reduce((s, t) => s + Math.abs(Number(t.amount)), 0);
+                const monthDeductible = txs.filter(t => t.isDeductible).reduce((s, t) => s + Math.abs(Number(t.amount)) * t.deductiblePct / 100, 0);
+
+                return (
+                  <div key={monthKey} className="card p-0 overflow-hidden">
+                    {/* Month header — clickable */}
+                    <button
+                      onClick={() => toggleMonth(monthKey)}
+                      className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        {isCollapsed ? <ChevronDown size={16} className="text-slate-400" /> : <ChevronUp size={16} className="text-slate-400" />}
+                        <span className="font-semibold text-sm">{monthKey}</span>
+                        <span className="text-xs text-slate-400">{txs.length} transactions</span>
                       </div>
-                      {tx.notes && (
-                        <div className="text-xs text-slate-400 truncate">{tx.notes}</div>
-                      )}
-                    </td>
-                    <td className={`py-2.5 px-3 sm:px-4 text-right font-medium whitespace-nowrap text-xs sm:text-sm ${
-                      tx.type === 'INCOME' ? 'text-brand-600' : 'text-slate-900 dark:text-slate-100'
-                    }`}>
-                      {tx.type === 'INCOME' ? '+' : '-'}{formatZAR(Math.abs(Number(tx.amount)))}
-                    </td>
-                    <td className="py-2.5 px-3 sm:px-4 hidden sm:table-cell">
-                      {editingId === tx.id ? (
-                        <select
-                          value={editData.category}
-                          onChange={e => setEditData({ ...editData, category: e.target.value })}
-                          className="input py-1 px-2 text-xs"
-                        >
-                          {Object.keys(ZA_EXPENSE_CATEGORIES).map(cat => (
-                            <option key={cat} value={cat}>{cat}</option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                          {tx.userCategory || tx.category || '—'}
-                          {tx.userOverride && <span className="text-brand-500 ml-1">✎</span>}
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 sm:px-4 text-center hidden sm:table-cell">
-                      {editingId === tx.id ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={editData.isDeductible}
-                            onChange={e => setEditData({ ...editData, isDeductible: e.target.checked })}
-                          />
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={editData.deductiblePct}
-                            onChange={e => setEditData({ ...editData, deductiblePct: parseInt(e.target.value) || 0 })}
-                            className="input py-0.5 px-1 text-xs w-14"
-                          />%
-                        </div>
-                      ) : tx.isDeductible ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-brand-600">
-                          <CheckCircle size={14} />
-                          {tx.deductiblePct}%
-                        </span>
-                      ) : (
-                        <XCircle size={14} className="mx-auto text-slate-300" />
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 sm:px-4 text-center">
-                      {editingId === tx.id ? (
-                        <button onClick={saveEdit} className="text-brand-600 hover:text-brand-700">
-                          <Save size={16} />
-                        </button>
-                      ) : (
-                        <button onClick={() => startEdit(tx)} className="text-slate-400 hover:text-brand-600">
-                          <Edit3 size={16} />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                      <div className="flex items-center gap-4 text-xs">
+                        {monthIncome > 0 && <span className="text-brand-600">+{formatZAR(monthIncome)}</span>}
+                        <span className="text-slate-500">-{formatZAR(monthExpenses)}</span>
+                        {monthDeductible > 0 && <span className="text-brand-600 font-medium">Ded: {formatZAR(monthDeductible)}</span>}
+                      </div>
+                    </button>
+
+                    {/* Transactions table (collapsible) */}
+                    {!isCollapsed && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-slate-200 dark:border-slate-700">
+                              <th className="text-left py-2 px-3 sm:px-4 font-medium text-slate-500 text-xs">Date</th>
+                              <th className="text-left py-2 px-3 sm:px-4 font-medium text-slate-500 text-xs">Description</th>
+                              <th className="text-right py-2 px-3 sm:px-4 font-medium text-slate-500 text-xs">Amount</th>
+                              <th className="text-left py-2 px-3 sm:px-4 font-medium text-slate-500 text-xs hidden sm:table-cell">Category</th>
+                              <th className="text-center py-2 px-3 sm:px-4 font-medium text-slate-500 text-xs hidden sm:table-cell">Deductible</th>
+                              <th className="text-center py-2 px-3 sm:px-4 font-medium text-slate-500 text-xs">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {txs.map(tx => (
+                              <tr key={tx.id} className="border-b border-slate-100 dark:border-slate-700/50 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                                <td className="py-2.5 px-3 sm:px-4 whitespace-nowrap text-slate-500 text-xs">
+                                  {new Date(tx.date).toLocaleDateString('en-ZA')}
+                                </td>
+                                <td className="py-2.5 px-3 sm:px-4 max-w-[150px] sm:max-w-[250px] truncate text-xs sm:text-sm" title={tx.description}>
+                                  <div className="flex items-center gap-1.5">
+                                    {tx.flag === 'OBVIOUS' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-brand-500" title="Obvious deduction" />}
+                                    {tx.flag === 'LIKELY' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-blue-500" title="Likely deduction" />}
+                                    {tx.flag === 'REVIEW' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-amber-500" title="Needs review" />}
+                                    {tx.flag === 'PERSONAL' && <span className="shrink-0 inline-block w-2 h-2 rounded-full bg-slate-300" title="Personal expense" />}
+                                    <span className="truncate">{tx.description}</span>
+                                  </div>
+                                  {tx.notes && (
+                                    <div className="text-xs text-slate-400 truncate">{tx.notes}</div>
+                                  )}
+                                </td>
+                                <td className={`py-2.5 px-3 sm:px-4 text-right font-medium whitespace-nowrap text-xs sm:text-sm ${
+                                  tx.type === 'INCOME' ? 'text-brand-600' : 'text-slate-900 dark:text-slate-100'
+                                }`}>
+                                  {tx.type === 'INCOME' ? '+' : '-'}{formatZAR(Math.abs(Number(tx.amount)))}
+                                </td>
+                                <td className="py-2.5 px-3 sm:px-4 hidden sm:table-cell">
+                                  {editingId === tx.id ? (
+                                    <select
+                                      value={editData.category}
+                                      onChange={e => setEditData({ ...editData, category: e.target.value })}
+                                      className="input py-1 px-2 text-xs"
+                                    >
+                                      {Object.keys(ZA_EXPENSE_CATEGORIES).map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                      {tx.userCategory || tx.category || '—'}
+                                      {tx.userOverride && <span className="text-brand-500 ml-1">✎</span>}
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-2.5 px-3 sm:px-4 text-center hidden sm:table-cell">
+                                  {editingId === tx.id ? (
+                                    <div className="flex items-center justify-center gap-2">
+                                      <input
+                                        type="checkbox"
+                                        checked={editData.isDeductible}
+                                        onChange={e => setEditData({ ...editData, isDeductible: e.target.checked })}
+                                      />
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={editData.deductiblePct}
+                                        onChange={e => setEditData({ ...editData, deductiblePct: parseInt(e.target.value) || 0 })}
+                                        className="input py-0.5 px-1 text-xs w-14"
+                                      />%
+                                    </div>
+                                  ) : tx.isDeductible ? (
+                                    <span className="inline-flex items-center gap-1 text-xs text-brand-600">
+                                      <CheckCircle size={14} />
+                                      {tx.deductiblePct}%
+                                    </span>
+                                  ) : (
+                                    <XCircle size={14} className="mx-auto text-slate-300" />
+                                  )}
+                                </td>
+                                <td className="py-2.5 px-3 sm:px-4 text-center">
+                                  {editingId === tx.id ? (
+                                    <button onClick={saveEdit} className="text-brand-600 hover:text-brand-700">
+                                      <Save size={16} />
+                                    </button>
+                                  ) : (
+                                    <button onClick={() => startEdit(tx)} className="text-slate-400 hover:text-brand-600">
+                                      <Edit3 size={16} />
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </div>
       </div>
     </div>

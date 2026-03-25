@@ -39,6 +39,10 @@ export async function GET() {
       orderBy: { startDate: 'desc' },
       include: {
         _count: { select: { transactions: true, deductions: true } },
+        statements: {
+          select: { id: true, fileName: true, monthLabel: true, createdAt: true, pageCount: true },
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 

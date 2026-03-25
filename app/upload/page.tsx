@@ -19,6 +19,8 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
+  Calendar,
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -42,6 +44,24 @@ interface UploadedFile {
 const formatZAR = (amount: number) =>
   new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(amount);
 
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Get the 12 months for a SA tax year (March of startYear → February of endYear) */
+function getTaxYearMonths(yearLabel: string): { label: string; short: string }[] {
+  const [startYearStr, endYearStr] = yearLabel.split('/');
+  const startYear = parseInt(startYearStr);
+  const endYear = parseInt(endYearStr);
+  if (isNaN(startYear) || isNaN(endYear)) return [];
+  const months: { label: string; short: string }[] = [];
+  for (let m = 2; m <= 11; m++) { // March(2) to December(11) of startYear
+    months.push({ label: `${MONTH_NAMES[m]} ${startYear}`, short: `${MONTH_SHORT[m]} ${startYear}` });
+  }
+  months.push({ label: `${MONTH_NAMES[0]} ${endYear}`, short: `${MONTH_SHORT[0]} ${endYear}` }); // Jan
+  months.push({ label: `${MONTH_NAMES[1]} ${endYear}`, short: `${MONTH_SHORT[1]} ${endYear}` }); // Feb
+  return months;
+}
+
 function UploadContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -57,6 +77,7 @@ function UploadContent() {
   const [profileComplete, setProfileComplete] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [uploadedMonths, setUploadedMonths] = useState<Record<string, { fileName: string; createdAt: string }>>({});
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -68,6 +89,24 @@ function UploadContent() {
       fetchProfile();
     }
   }, [user]);
+
+  // When tax year changes, update uploaded months checklist
+  useEffect(() => {
+    if (taxYearId && taxYears.length > 0) {
+      const ty = taxYears.find((t: any) => t.id === taxYearId);
+      if (ty?.statements) {
+        const map: Record<string, { fileName: string; createdAt: string }> = {};
+        for (const s of ty.statements) {
+          if (s.monthLabel) {
+            map[s.monthLabel] = { fileName: s.fileName, createdAt: s.createdAt };
+          }
+        }
+        setUploadedMonths(map);
+      } else {
+        setUploadedMonths({});
+      }
+    }
+  }, [taxYearId, taxYears]);
 
   const fetchTaxYears = async () => {
     try {
@@ -213,6 +252,8 @@ function UploadContent() {
 
     if (results.length > 0) {
       toast.success(`Successfully analyzed ${results.length} statement(s)!`);
+      // Refresh tax years to update month checklist
+      fetchTaxYears();
     }
   };
 
@@ -306,6 +347,58 @@ function UploadContent() {
             </p>
           )}
         </div>
+
+        {/* Month upload checklist */}
+        {taxYearId && taxYears.length > 0 && (() => {
+          const ty = taxYears.find((t: any) => t.id === taxYearId);
+          if (!ty) return null;
+          const months = getTaxYearMonths(ty.yearLabel);
+          if (months.length === 0) return null;
+          const uploadedCount = months.filter(m => uploadedMonths[m.label]).length;
+          return (
+            <div className="card mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Calendar size={18} className="text-brand-600" />
+                  <span className="font-semibold text-sm">Upload Progress</span>
+                </div>
+                <span className="text-xs text-slate-500">{uploadedCount}/12 months</span>
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                {months.map(m => {
+                  const uploaded = uploadedMonths[m.label];
+                  return (
+                    <div
+                      key={m.label}
+                      className={`relative rounded-lg p-2 text-center text-xs transition-colors ${
+                        uploaded
+                          ? 'bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-800'
+                          : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-dashed'
+                      }`}
+                      title={uploaded ? `${uploaded.fileName}\nUploaded ${new Date(uploaded.createdAt).toLocaleDateString('en-ZA')}` : `${m.label} — not uploaded`}
+                    >
+                      {uploaded && (
+                        <CheckCircle size={12} className="absolute top-1 right-1 text-brand-500" />
+                      )}
+                      <div className={`font-medium ${uploaded ? 'text-brand-700 dark:text-brand-300' : 'text-slate-400'}`}>
+                        {m.short.split(' ')[0]}
+                      </div>
+                      <div className={`text-[10px] ${uploaded ? 'text-brand-500' : 'text-slate-300 dark:text-slate-600'}`}>
+                        {m.short.split(' ')[1]}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {uploadedCount > 0 && uploadedCount < 12 && (
+                <p className="text-xs text-slate-500 mt-3">
+                  <RefreshCw size={12} className="inline mr-1" />
+                  Re-uploading a month automatically replaces the previous data — no duplicates.
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Drop zone */}
         <div

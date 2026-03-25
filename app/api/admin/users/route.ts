@@ -10,8 +10,14 @@ export async function PATCH(req: NextRequest) {
 
   const { userId, credits } = await req.json();
 
-  if (!userId || typeof credits !== 'number' || credits < 0) {
-    return NextResponse.json({ error: 'Invalid userId or credits' }, { status: 400 });
+  if (!userId || typeof credits !== 'number' || credits < 0 || credits > 9999) {
+    return NextResponse.json({ error: 'Invalid userId or credits (0-9999)' }, { status: 400 });
+  }
+
+  // Verify user exists
+  const existing = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, credits: true } });
+  if (!existing) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   const user = await prisma.user.update({
@@ -19,6 +25,8 @@ export async function PATCH(req: NextRequest) {
     data: { credits },
     select: { id: true, email: true, name: true, credits: true },
   });
+
+  console.log(`[ADMIN] ${admin.email} set credits for ${user.email}: ${existing.credits} → ${credits}`);
 
   return NextResponse.json({ success: true, user });
 }

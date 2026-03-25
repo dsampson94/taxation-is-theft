@@ -5,7 +5,7 @@ import { getOpenAI, ANALYZE_STATEMENT_PROMPT, buildAnalysisPrompt } from '@/app/
 import { validateAndEnrichAnalysis, type AnalyzedTransaction } from '@/app/lib/deduction-rules';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 // Helper: send an SSE event
 function sseEvent(event: string, data: any): string {

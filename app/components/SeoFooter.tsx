@@ -27,6 +27,16 @@ export default function SeoFooter() {
               <Link href="/register" className="block hover:text-white transition-colors">Get Started Free</Link>
               <Link href="/login" className="block hover:text-white transition-colors">Log In</Link>
             </div>
+
+            <h4 className="text-white font-semibold mb-3 mt-6">Legal</h4>
+            <ul className="space-y-1.5 text-sm">
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
+            </ul>
+            <p className="mt-4 text-xs text-slate-500">
+              Disclaimer: This tool provides tax guidance, not professional tax advice.
+              Consult a registered tax practitioner for complex matters.
+            </p>
           </div>
 
           <div>
@@ -96,16 +106,6 @@ export default function SeoFooter() {
                 </li>
               )}
             </ul>
-
-            <h4 className="text-white font-semibold mb-3 mt-6">Legal</h4>
-            <ul className="space-y-1.5 text-sm">
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
-            </ul>
-            <p className="mt-4 text-xs text-slate-500">
-              Disclaimer: This tool provides tax guidance, not professional tax advice.
-              Consult a registered tax practitioner for complex matters.
-            </p>
           </div>
         </div>
 

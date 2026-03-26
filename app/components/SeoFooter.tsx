@@ -99,8 +99,8 @@ export default function SeoFooter() {
 
             <h4 className="text-white font-semibold mb-3 mt-6">Legal</h4>
             <ul className="space-y-1.5 text-sm">
-              <li><span className="text-slate-500">Privacy Policy</span></li>
-              <li><span className="text-slate-500">Terms of Service</span></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link></li>
             </ul>
             <p className="mt-4 text-xs text-slate-500">
               Disclaimer: This tool provides tax guidance, not professional tax advice.

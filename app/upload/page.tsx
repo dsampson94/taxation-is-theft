@@ -41,6 +41,7 @@ interface UploadedFile {
   analysis?: any;
   error?: string;
   selectedMonth?: string; // User-confirmed month label e.g. "November 2025"
+  accountType?: 'CHEQUE' | 'CREDIT_CARD' | 'SAVINGS'; // Account type for AI context
 }
 
 const formatZAR = (amount: number) =>
@@ -106,7 +107,7 @@ function UploadContent() {
   const [profileComplete, setProfileComplete] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
-  const [uploadedMonths, setUploadedMonths] = useState<Record<string, { fileName: string; createdAt: string }>>({});
+  const [uploadedMonths, setUploadedMonths] = useState<Record<string, { fileName: string; createdAt: string; accountType?: string }>>({});
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [showNoCreditModal, setShowNoCreditModal] = useState(false);
@@ -134,10 +135,10 @@ function UploadContent() {
     if (taxYearId && taxYears.length > 0) {
       const ty = taxYears.find((t: any) => t.id === taxYearId);
       if (ty?.statements) {
-        const map: Record<string, { fileName: string; createdAt: string }> = {};
+        const map: Record<string, { fileName: string; createdAt: string; accountType?: string }> = {};
         for (const s of ty.statements) {
           if (s.monthLabel) {
-            map[s.monthLabel] = { fileName: s.fileName, createdAt: s.createdAt };
+            map[s.monthLabel] = { fileName: s.fileName, createdAt: s.createdAt, accountType: s.accountType };
           }
         }
         setUploadedMonths(map);
@@ -212,6 +213,7 @@ function UploadContent() {
       file,
       status: 'pending',
       selectedMonth: detectMonthFromFilename(file.name) || '',
+      accountType: 'CHEQUE',
     }));
     setFiles(prev => [...prev, ...newFiles]);
   }, []);
@@ -302,6 +304,7 @@ function UploadContent() {
             fileName: f.file.name,
             fileSize: f.file.size,
             selectedMonth: f.selectedMonth,
+            accountType: f.accountType || 'CHEQUE',
           }),
         });
 
@@ -337,6 +340,8 @@ function UploadContent() {
           )
         );
         results.push(data.analysis);
+        // Refresh progress after each successful file
+        fetchTaxYears();
       } catch (error: any) {
         setFiles(prev =>
           prev.map((file, idx) => idx === i ? { ...file, status: 'error', error: error.message } : file)
@@ -464,6 +469,7 @@ function UploadContent() {
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                 {months.map(m => {
                   const uploaded = uploadedMonths[m.label];
+                  const acctLabel = uploaded?.accountType === 'CREDIT_CARD' ? 'CC' : uploaded?.accountType === 'SAVINGS' ? 'SAV' : uploaded ? 'CHQ' : '';
                   return (
                     <div
                       key={m.label}
@@ -472,7 +478,7 @@ function UploadContent() {
                           ? 'bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-800'
                           : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-dashed'
                       }`}
-                      title={uploaded ? `${uploaded.fileName}\nUploaded ${new Date(uploaded.createdAt).toLocaleDateString('en-ZA')}` : `${m.label} — not uploaded`}
+                      title={uploaded ? `${uploaded.fileName}${uploaded.accountType ? ` (${uploaded.accountType})` : ''}\nUploaded ${new Date(uploaded.createdAt).toLocaleDateString('en-ZA')}` : `${m.label} — not uploaded`}
                     >
                       {uploaded && (
                         <CheckCircle size={12} className="absolute top-1 right-1 text-brand-500" />
@@ -483,6 +489,13 @@ function UploadContent() {
                       <div className={`text-[10px] ${uploaded ? 'text-brand-500' : 'text-slate-300 dark:text-slate-600'}`}>
                         {m.short.split(' ')[1]}
                       </div>
+                      {uploaded && acctLabel && (
+                        <div className={`text-[9px] mt-0.5 font-medium ${
+                          uploaded.accountType === 'CREDIT_CARD' ? 'text-amber-600' : uploaded.accountType === 'SAVINGS' ? 'text-blue-500' : 'text-brand-600'
+                        }`}>
+                          {acctLabel}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -712,9 +725,9 @@ function UploadContent() {
                       </button>
                     )}
                   </div>
-                  {/* Month selector row */}
+                  {/* Month + Account type selector row */}
                   {f.status !== 'done' && months.length > 0 && (
-                    <div className="flex items-center gap-2 ml-8">
+                    <div className="flex flex-wrap items-center gap-2 ml-8">
                       <Calendar size={14} className="text-slate-400 shrink-0" />
                       <select
                         value={f.selectedMonth || ''}
@@ -736,6 +749,20 @@ function UploadContent() {
                       ) : (
                         <span className="text-xs text-amber-500">⚠ Please select</span>
                       )}
+                      <select
+                        value={f.accountType || 'CHEQUE'}
+                        onChange={e => {
+                          const val = e.target.value as 'CHEQUE' | 'CREDIT_CARD' | 'SAVINGS';
+                          setFiles(prev => prev.map((file, idx) =>
+                            idx === i ? { ...file, accountType: val } : file
+                          ));
+                        }}
+                        className="input py-1 px-2 text-xs max-w-[150px]"
+                      >
+                        <option value="CHEQUE">Cheque / Salary</option>
+                        <option value="CREDIT_CARD">Credit Card</option>
+                        <option value="SAVINGS">Savings</option>
+                      </select>
                     </div>
                   )}
                 </div>
@@ -785,6 +812,13 @@ function UploadContent() {
                 className="btn-secondary py-2 px-4 text-sm"
               >
                 Review Transactions
+              </Link>
+              <Link
+                href={`/checkpoints?taxYearId=${taxYearId}`}
+                className="btn-secondary py-2 px-4 text-sm border-brand-300 text-brand-700 hover:bg-brand-50"
+              >
+                <Shield size={16} className="mr-2" />
+                Triple Check
               </Link>
             </div>
           </div>

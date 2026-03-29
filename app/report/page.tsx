@@ -12,6 +12,7 @@ import {
   PieChart,
   Download,
   ArrowLeft,
+  Shield,
 } from 'lucide-react';
 
 const formatZAR = (amount: number) =>
@@ -146,6 +147,15 @@ function ReportContent() {
               <Download size={16} className="mr-1" />
               Export
             </button>
+          )}
+          {selectedTaxYearId && (
+            <Link
+              href={`/checkpoints?taxYearId=${selectedTaxYearId}`}
+              className="btn-secondary py-2 px-3 text-sm border-brand-300 text-brand-700 hover:bg-brand-50 flex items-center gap-1.5"
+            >
+              <Shield size={16} />
+              Triple Check
+            </Link>
           )}
         </div>
 

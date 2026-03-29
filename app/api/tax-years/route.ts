@@ -40,7 +40,7 @@ export async function GET() {
       include: {
         _count: { select: { transactions: true, deductions: true } },
         statements: {
-          select: { id: true, fileName: true, monthLabel: true, createdAt: true, pageCount: true },
+          select: { id: true, fileName: true, monthLabel: true, accountType: true, createdAt: true, pageCount: true },
           orderBy: { createdAt: 'desc' },
         },
       },

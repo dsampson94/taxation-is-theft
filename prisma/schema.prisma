@@ -219,7 +219,8 @@ model StatementUpload {
   fileName    String
   pageCount   Int      @default(0)
   fileSize    Int      @default(0)
-  monthLabel  String?  // e.g. "2024-03" — which month this statement covers
+  monthLabel  String?  // e.g. "November 2025" — which month this statement covers
+  accountType String?  // "CHEQUE", "CREDIT_CARD", "SAVINGS"
   
   createdAt   DateTime @default(now())
   

@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { text, occupation, taxYearId, fileName, fileSize, selectedMonth } = await request.json();
+  const { text, occupation, taxYearId, fileName, fileSize, selectedMonth, accountType } = await request.json();
   if (!text || text.length < 50) {
     return NextResponse.json({ error: 'Statement text too short or empty' }, { status: 400 });
   }
@@ -178,6 +178,15 @@ export async function POST(request: NextRequest) {
       prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);
     }
 
+    // ═══ ACCOUNT TYPE CONTEXT: Help AI understand the statement type ═══
+    if (accountType === 'CREDIT_CARD') {
+      prompt += `\n\n═══ ACCOUNT TYPE: CREDIT CARD ═══\nThis is a CREDIT CARD statement. Important distinctions:\n- All purchases/charges are EXPENSES (not income)\n- Payments TO the card (credits) are TRANSFERS from the user's cheque account — NOT income\n- Interest charges and annual fees are bank fees\n- Cash advances are TRANSFERS, not expenses\n- Focus on identifying business expenses vs personal spending`;
+    } else if (accountType === 'SAVINGS') {
+      prompt += `\n\n═══ ACCOUNT TYPE: SAVINGS ACCOUNT ═══\nThis is a SAVINGS account statement. Important distinctions:\n- Interest earned is INCOME (investment income)\n- Transfers in/out are TRANSFERS between own accounts\n- There should be minimal expenses — mostly transfers and interest`;
+    } else {
+      prompt += `\n\n═══ ACCOUNT TYPE: CHEQUE / SALARY ACCOUNT ═══\nThis is a CHEQUE/SALARY account statement. This is the primary account:\n- Salary/income deposits are INCOME\n- Debit orders, card purchases, and EFTs are EXPENSES\n- Transfers to savings/credit card are TRANSFERS\n- This account typically shows the full picture of income and spending`;
+    }
+
     // ═══ CONTEXT INJECTION: Load accumulated context for this tax year ═══
     let existingContext: TaxYearContext | null = null;
     if (taxYearId) {
@@ -204,7 +213,7 @@ export async function POST(request: NextRequest) {
     const CHUNK_SIZE = 40000;
     const chunks = splitStatementIntoChunks(safeText, CHUNK_SIZE);
     const openai = getOpenAI();
-    const model = process.env.OPENAI_MODEL || 'gpt-4o';
+    const model = (process.env.OPENAI_MODEL || 'gpt-4o').trim();
 
     const chunkPromises = chunks.map((chunk, i) => {
       const chunkLabel = chunks.length > 1
@@ -331,6 +340,7 @@ export async function POST(request: NextRequest) {
           pageCount: pageEstimate,
           fileSize: fileSize || text.length,
           monthLabel,
+          accountType: accountType || null,
         },
       });
 

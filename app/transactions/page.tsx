@@ -14,6 +14,7 @@ import {
   Filter,
   ChevronDown,
   ChevronUp,
+  Shield,
 } from 'lucide-react';
 import { ZA_EXPENSE_CATEGORIES } from '@/app/lib/tax-rates-za';
 
@@ -54,6 +55,7 @@ function TransactionsContent() {
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<any>(null);
+  const [statementMap, setStatementMap] = useState<Record<string, string>>({});
   const [taxYears, setTaxYears] = useState<any[]>([]);
   const [selectedTaxYearId, setSelectedTaxYearId] = useState(taxYearIdParam || '');
   const [loading, setLoading] = useState(false);
@@ -93,6 +95,7 @@ function TransactionsContent() {
         const data = await res.json();
         setTransactions(data.transactions);
         setSummary(data.summary);
+        setStatementMap(data.statementMap || {});
       }
     } catch {
       toast.error('Failed to load transactions');
@@ -168,6 +171,16 @@ function TransactionsContent() {
               <option key={ty.id} value={ty.id}>{ty.yearLabel}</option>
             ))}
           </select>
+
+          {selectedTaxYearId && (
+            <Link
+              href={`/checkpoints?taxYearId=${selectedTaxYearId}`}
+              className="btn-secondary py-1.5 px-3 text-xs sm:text-sm border-brand-300 text-brand-700 hover:bg-brand-50 flex items-center gap-1.5"
+            >
+              <Shield size={14} />
+              Triple Check
+            </Link>
+          )}
 
           <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {(['all', 'income', 'expense', 'deductible', 'review'] as const).map(f => (
@@ -267,6 +280,15 @@ function TransactionsContent() {
                         {isCollapsed ? <ChevronDown size={16} className="text-slate-400" /> : <ChevronUp size={16} className="text-slate-400" />}
                         <span className="font-semibold text-sm">{monthKey}</span>
                         <span className="text-xs text-slate-400">{txs.length} transactions</span>
+                        {statementMap[monthKey] && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                            statementMap[monthKey] === 'CREDIT_CARD' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                            statementMap[monthKey] === 'SAVINGS' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                            'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400'
+                          }`}>
+                            {statementMap[monthKey] === 'CREDIT_CARD' ? 'Credit Card' : statementMap[monthKey] === 'SAVINGS' ? 'Savings' : 'Cheque'}
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-4 text-xs">
                         {monthIncome > 0 && <span className="text-brand-600">+{formatZAR(monthIncome)}</span>}

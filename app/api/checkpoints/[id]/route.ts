@@ -136,7 +136,7 @@ export async function POST(
     }
 
     const openai = getOpenAI();
-    const model = process.env.OPENAI_MODEL || 'gpt-4o';
+    const model = (process.env.OPENAI_MODEL || 'gpt-4o').trim();
 
     const completion = await openai.chat.completions.create({
       model,

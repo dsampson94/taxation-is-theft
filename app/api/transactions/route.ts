@@ -22,6 +22,20 @@ export async function GET(request: NextRequest) {
       orderBy: { date: 'desc' },
     });
 
+    // Load statements mapping (monthLabel → accountType) for this tax year
+    let statementMap: Record<string, string> = {};
+    if (taxYearId) {
+      const statements = await prisma.statementUpload.findMany({
+        where: { taxYearId, userId: authUser.userId },
+        select: { monthLabel: true, accountType: true },
+      });
+      for (const s of statements) {
+        if (s.monthLabel && s.accountType) {
+          statementMap[s.monthLabel] = s.accountType;
+        }
+      }
+    }
+
     // Compute summaries
     const income = transactions.filter(t => t.type === 'INCOME');
     const expenses = transactions.filter(t => t.type === 'EXPENSE');
@@ -36,6 +50,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       transactions,
+      statementMap,
       summary: {
         totalIncome,
         totalExpenses,

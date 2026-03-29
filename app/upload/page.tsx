@@ -23,6 +23,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
+import { NoCreditModal, CreditChip } from '@/app/components/CreditBanner';
 
 export default function UploadPage() {
   return (
@@ -108,6 +109,14 @@ function UploadContent() {
   const [uploadedMonths, setUploadedMonths] = useState<Record<string, { fileName: string; createdAt: string }>>({});
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [showNoCreditModal, setShowNoCreditModal] = useState(false);
+  const [lastAnalysisInfo, setLastAnalysisInfo] = useState<{
+    creditsRemaining: number;
+    creditCharged: boolean;
+    isReanalysis: boolean;
+    isAdmin: boolean;
+    qualityWarning?: string | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/login');
@@ -299,12 +308,28 @@ function UploadContent() {
         const data = await res.json();
 
         if (!res.ok) {
+          if (res.status === 403 && data.code === 'NO_CREDITS') {
+            setShowNoCreditModal(true);
+            setFiles(prev =>
+              prev.map((file, idx) => idx === i ? { ...file, status: 'error', error: 'No credits remaining' } : file)
+            );
+            break; // Stop processing further files
+          }
           throw new Error(data.error || 'Analysis failed');
         }
 
         if (!data.analysis) {
           throw new Error('No analysis result received');
         }
+
+        // Track credit info from the response
+        setLastAnalysisInfo({
+          creditsRemaining: data.creditsRemaining,
+          creditCharged: data.creditCharged,
+          isReanalysis: data.isReanalysis,
+          isAdmin: data.isAdmin,
+          qualityWarning: data.qualityWarning,
+        });
 
         setFiles(prev =>
           prev.map((file, idx) =>
@@ -800,6 +825,24 @@ function UploadContent() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* No credit modal */}
+      {showNoCreditModal && (
+        <NoCreditModal onClose={() => setShowNoCreditModal(false)} />
+      )}
+
+      {/* Credit info after analysis */}
+      {lastAnalysisInfo && !analyzing && (
+        <div className="fixed bottom-4 right-4 z-40">
+          <CreditChip
+            credits={lastAnalysisInfo.creditsRemaining}
+            creditCharged={lastAnalysisInfo.creditCharged}
+            isReanalysis={lastAnalysisInfo.isReanalysis}
+            isAdmin={lastAnalysisInfo.isAdmin}
+            qualityWarning={lastAnalysisInfo.qualityWarning}
+          />
         </div>
       )}
     </div>

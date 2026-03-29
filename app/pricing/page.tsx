@@ -10,75 +10,45 @@ import {
   Zap,
   Crown,
   Sparkles,
+  Plus,
   ArrowRight,
   Shield,
   CreditCard,
   Lock,
   FileText,
+  Brain,
+  RefreshCw,
 } from 'lucide-react';
+import { CREDIT_PLANS } from '@/app/lib/pricing';
 
-const PLANS = [
-  {
-    id: 'single',
-    name: 'Single Analysis',
-    credits: 1,
-    price: 43,
-    perCredit: '43.00',
-    popular: false,
+// Map plan IDs to display config
+const PLAN_UI: Record<string, { icon: any; color: string; btnClass: string; badge?: string }> = {
+  starter: {
     icon: Zap,
     color: 'border-slate-200 dark:border-slate-700',
     btnClass: 'btn-secondary',
-    description: 'Analyze one bank statement',
-    features: [
-      '1 statement analysis',
-      'AI transaction categorization',
-      'Tax deduction identification',
-      'Basic tax report',
-    ],
   },
-  {
-    id: 'tax-year',
-    name: 'Tax Year Pack',
-    credits: 12,
-    price: 330,
-    perCredit: '27.50',
-    popular: true,
+  'tax-year': {
     icon: Crown,
     color: 'border-brand-500 ring-2 ring-brand-500/20',
     btnClass: 'btn-primary',
-    description: 'Complete tax year — best value',
-    badge: 'SAVE 36%',
-    features: [
-      '12 statement analyses',
-      'Full tax year coverage (Mar–Feb)',
-      'AI transaction categorization',
-      'Detailed tax report with savings',
-      'Category breakdown & SARS references',
-      'SARS-ready deduction list',
-    ],
+    badge: 'BEST VALUE',
   },
-  {
-    id: 'full-coverage',
-    name: 'Full Coverage',
-    credits: 24,
-    price: 527,
-    perCredit: '21.96',
-    popular: false,
+  'full-coverage': {
     icon: Sparkles,
     color: 'border-slate-200 dark:border-slate-700',
     btnClass: 'btn-primary',
-    description: 'Bank + credit card for the year',
-    badge: 'SAVE 49%',
-    features: [
-      '24 statement analyses',
-      'Bank account + credit card coverage',
-      'Everything in Tax Year Pack',
-      'Multiple account support',
-      'Year-on-year comparison',
-      'Priority AI processing',
-    ],
+    badge: 'SAVE 37%',
   },
-];
+  'topup-6': {
+    icon: Plus,
+    color: 'border-slate-200 dark:border-slate-700',
+    btnClass: 'btn-secondary',
+  },
+};
+
+const MAIN_PLANS = CREDIT_PLANS.filter(p => !('isTopUp' in p && p.isTopUp));
+const TOPUP_PLAN = CREDIT_PLANS.find(p => 'isTopUp' in p && p.isTopUp);
 
 export default function PricingPage() {
   const { user } = useAuth();
@@ -142,8 +112,8 @@ export default function PricingPage() {
             Simple, Transparent Pricing
           </h1>
           <p className="text-lg text-brand-100 max-w-2xl mx-auto mb-2">
-            Pay per statement. No subscriptions. No hidden fees.<br />
-            Each analysis = one bank statement analyzed by AI.
+            Pay per statement. No subscriptions. No feature gates.<br />
+            Every plan includes the full AI-powered tax experience.
           </p>
           {user && (
             <div className="mt-4 inline-flex items-center gap-2 bg-white/20 rounded-lg px-4 py-2 text-sm">
@@ -158,20 +128,22 @@ export default function PricingPage() {
       <section className="py-16 bg-slate-50 dark:bg-slate-950">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
-            {PLANS.map(plan => {
-              const Icon = plan.icon;
+            {MAIN_PLANS.map(plan => {
+              const ui = PLAN_UI[plan.id] || PLAN_UI.starter;
+              const Icon = ui.icon;
+              const isPopular = plan.popular;
               return (
                 <div
                   key={plan.id}
-                  className={`card relative ${plan.color} ${plan.popular ? 'scale-[1.02]' : ''}`}
+                  className={`card relative ${ui.color} ${isPopular ? 'scale-[1.02]' : ''}`}
                 >
-                  {plan.popular && (
+                  {ui.badge && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                      BEST VALUE
+                      {ui.badge}
                     </div>
                   )}
                   <div className="text-center mb-6">
-                    <Icon className={`mx-auto mb-3 ${plan.popular ? 'text-brand-600' : 'text-slate-400'}`} size={32} />
+                    <Icon className={`mx-auto mb-3 ${isPopular ? 'text-brand-600' : 'text-slate-400'}`} size={32} />
                     <h3 className="text-xl font-bold">{plan.name}</h3>
                     <p className="text-sm text-slate-500">{plan.description}</p>
                   </div>
@@ -179,16 +151,11 @@ export default function PricingPage() {
                   <div className="text-center mb-6">
                     <div className="flex items-baseline justify-center gap-1">
                       <span className="text-sm text-slate-500">R</span>
-                      <span className="text-4xl font-bold">{plan.price}</span>
+                      <span className="text-4xl font-bold">{plan.priceZAR}</span>
                     </div>
                     <div className="text-sm text-slate-500 mt-1">
-                      {plan.credits} {plan.credits === 1 ? 'analysis' : 'analyses'} &bull; R{plan.perCredit} each
+                      {plan.credits} {plan.credits as number === 1 ? 'analysis' : 'analyses'} &bull; R{plan.pricePerCredit.toFixed(2)} each
                     </div>
-                    {'badge' in plan && plan.badge && (
-                      <span className="inline-block mt-2 bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                        {plan.badge}
-                      </span>
-                    )}
                   </div>
 
                   <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
@@ -203,19 +170,68 @@ export default function PricingPage() {
                   <button
                     onClick={() => handlePurchase(plan.id)}
                     disabled={loading === plan.id}
-                    className={`${plan.btnClass} w-full`}
+                    className={`${ui.btnClass} w-full`}
                   >
-                    {loading === plan.id ? 'Processing...' : (
-                      plan.credits === 1 ? 'Buy 1 Analysis' : `Buy ${plan.credits} Analyses`
-                    )}
+                    {loading === plan.id ? 'Processing...' : `Buy ${plan.credits} Analyses`}
                   </button>
                 </div>
               );
             })}
           </div>
 
-          {/* Cost comparison callout */}
+          {/* Top-up option */}
+          {TOPUP_PLAN && (
+            <div className="card border-dashed border-2 border-slate-300 dark:border-slate-600 mb-12 max-w-md mx-auto">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center shrink-0">
+                  <Plus className="text-brand-600" size={24} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold">{TOPUP_PLAN.name}</h3>
+                  <p className="text-sm text-slate-500">{TOPUP_PLAN.description}</p>
+                  <p className="text-sm font-semibold mt-1">R{TOPUP_PLAN.priceZAR} &bull; {TOPUP_PLAN.credits} credits &bull; R{TOPUP_PLAN.pricePerCredit.toFixed(2)} each</p>
+                </div>
+                <button
+                  onClick={() => handlePurchase(TOPUP_PLAN.id)}
+                  disabled={loading === TOPUP_PLAN.id}
+                  className="btn-secondary whitespace-nowrap"
+                >
+                  {loading === TOPUP_PLAN.id ? '...' : 'Top Up'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* What's included callout */}
           <div className="card bg-gradient-to-r from-brand-50 to-blue-50 dark:from-brand-950/30 dark:to-blue-950/30 border-brand-200 dark:border-brand-800 mb-8">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-bold mb-2">Every plan includes the full experience</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+                No feature gates, no upsells. Buy credits and get everything.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
+              <div className="flex items-start gap-2 text-sm">
+                <Brain size={16} className="text-brand-600 mt-0.5 shrink-0" />
+                <span>Smart AI context that learns your spending patterns</span>
+              </div>
+              <div className="flex items-start gap-2 text-sm">
+                <RefreshCw size={16} className="text-brand-600 mt-0.5 shrink-0" />
+                <span>Free re-analysis of already-uploaded months</span>
+              </div>
+              <div className="flex items-start gap-2 text-sm">
+                <FileText size={16} className="text-brand-600 mt-0.5 shrink-0" />
+                <span>Tax checkpoints &amp; SARS-ready supporting docs</span>
+              </div>
+              <div className="flex items-start gap-2 text-sm">
+                <Shield size={16} className="text-brand-600 mt-0.5 shrink-0" />
+                <span>AES-256 encryption — your data stays private</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Cost comparison */}
+          <div className="card border-brand-200 dark:border-brand-800 mb-8">
             <div className="text-center">
               <h3 className="text-lg font-bold mb-2">Why are we so much cheaper than a tax practitioner?</h3>
               <p className="text-sm text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">

@@ -1,7 +1,11 @@
 import { getAuthUser } from './auth';
 import { prisma } from './db';
 
-const ADMIN_EMAILS = ['davesampson15@gmail.com'];
+export const ADMIN_EMAILS = ['davesampson15@gmail.com'];
+
+export function isAdminEmail(email: string): boolean {
+  return ADMIN_EMAILS.includes(email);
+}
 
 export async function getAdminUser() {
   const authUser = await getAuthUser();

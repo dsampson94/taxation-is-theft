@@ -15,7 +15,9 @@ import {
   BarChart3,
   Sparkles,
   Lock,
+  BookmarkPlus,
 } from 'lucide-react';
+import { CreditBanner } from '@/app/components/CreditBanner';
 
 interface TaxYear {
   id: string;
@@ -135,6 +137,9 @@ export default function DashboardPage() {
 
       <div className="bg-slate-50 dark:bg-slate-950">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Credit banner */}
+        <CreditBanner credits={user.credits} />
 
         {/* Profile CTA */}
         {!user.taxProfileComplete && (
@@ -275,6 +280,13 @@ export default function DashboardPage() {
                       Transactions
                     </Link>
                     <Link
+                      href={`/checkpoints?taxYearId=${ty.id}`}
+                      className="btn-secondary py-1.5 px-3 text-xs"
+                    >
+                      <BookmarkPlus size={14} className="mr-1" />
+                      Checkpoints
+                    </Link>
+                    <Link
                       href={`/report?taxYearId=${ty.id}`}
                       className="btn-primary py-1.5 px-3 text-xs"
                     >
@@ -304,6 +316,11 @@ export default function DashboardPage() {
             <TrendingDown className="text-brand-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
             <h3 className="font-semibold mb-1">Review Transactions</h3>
             <p className="text-sm text-slate-500">Review and adjust AI categorizations</p>
+          </Link>
+          <Link href="/checkpoints" className="card hover:border-brand-300 transition-colors group">
+            <BookmarkPlus className="text-brand-600 mb-3 group-hover:scale-110 transition-transform" size={24} />
+            <h3 className="font-semibold mb-1">Tax Checkpoints</h3>
+            <p className="text-sm text-slate-500">Save progress snapshots & supporting docs</p>
           </Link>
         </div>
 

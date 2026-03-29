@@ -3,6 +3,8 @@ import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
 import { getOpenAI, ANALYZE_STATEMENT_PROMPT, buildAnalysisPrompt } from '@/app/lib/openai';
 import { validateAndEnrichAnalysis, type AnalyzedTransaction } from '@/app/lib/deduction-rules';
+import { isAdminEmail } from '@/app/lib/admin';
+import { buildContextFromTransactions, mergeContext, contextToPromptText, type TaxYearContext } from '@/app/lib/context-builder';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -121,9 +123,6 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
-  if (user.credits <= 0) {
-    return NextResponse.json({ error: 'No credits remaining. Please purchase more credits.' }, { status: 403 });
-  }
   if (!user.taxProfileComplete) {
     return NextResponse.json(
       { error: 'Please complete your tax profile before analyzing statements.' },
@@ -134,6 +133,30 @@ export async function POST(request: NextRequest) {
   const { text, occupation, taxYearId, fileName, fileSize, selectedMonth } = await request.json();
   if (!text || text.length < 50) {
     return NextResponse.json({ error: 'Statement text too short or empty' }, { status: 400 });
+  }
+
+  // ═══ CREDIT LOGIC: Admin bypass, re-analysis check ═══
+  const isAdmin = isAdminEmail(user.email);
+  let isReanalysis = false;
+
+  // Check if this is a re-analysis of an existing month (free)
+  if (taxYearId && selectedMonth) {
+    const existingUpload = await prisma.statementUpload.findFirst({
+      where: { userId: user.id, taxYearId, monthLabel: selectedMonth },
+    });
+    if (existingUpload) {
+      isReanalysis = true;
+    }
+  }
+
+  const shouldChargeCredit = !isAdmin && !isReanalysis;
+
+  if (shouldChargeCredit && user.credits <= 0) {
+    return NextResponse.json({
+      error: 'No credits remaining. Purchase more credits to continue analyzing.',
+      code: 'NO_CREDITS',
+      creditsRemaining: 0,
+    }, { status: 403 });
   }
 
   try {
@@ -155,6 +178,22 @@ export async function POST(request: NextRequest) {
       prompt = ANALYZE_STATEMENT_PROMPT.replace('{occupation}', userOccupation);
     }
 
+    // ═══ CONTEXT INJECTION: Load accumulated context for this tax year ═══
+    let existingContext: TaxYearContext | null = null;
+    if (taxYearId) {
+      const taxYear = await prisma.taxYear.findUnique({
+        where: { id: taxYearId },
+        select: { contextJson: true },
+      });
+      if (taxYear?.contextJson) {
+        existingContext = taxYear.contextJson as unknown as TaxYearContext;
+        const contextText = contextToPromptText(existingContext);
+        if (contextText) {
+          prompt += `\n\n═══ LEARNED CONTEXT FROM PREVIOUS ANALYSES ═══\nThe following vendor classifications were learned from previous months. Use these as strong priors — the user has already confirmed or accepted these categorizations. Apply them to matching vendors in this statement:\n\n${contextText}`;
+        }
+      }
+    }
+
     // GPT-4o supports 128K context — allow up to ~120K chars input (~30K tokens)
     const maxInputChars = 120000;
     const safeText = text.length > maxInputChars
@@ -162,14 +201,11 @@ export async function POST(request: NextRequest) {
       : text;
 
     // ═══ CHUNKING: Split large statements to avoid output token limits ═══
-    // GPT-4o max output is 16,384 tokens. Each transaction ≈ 130 tokens in JSON.
-    // Safe limit: ~100 transactions per chunk. Split at ~40K chars per chunk.
     const CHUNK_SIZE = 40000;
     const chunks = splitStatementIntoChunks(safeText, CHUNK_SIZE);
     const openai = getOpenAI();
     const model = process.env.OPENAI_MODEL || 'gpt-4o';
 
-    // Fire all chunks in parallel — OpenAI handles concurrent requests fine
     const chunkPromises = chunks.map((chunk, i) => {
       const chunkLabel = chunks.length > 1
         ? `\n\n[Part ${i + 1} of ${chunks.length} — extract ALL transactions from this section]`
@@ -243,16 +279,32 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Deduct credit
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { credits: { decrement: 1 } },
-    });
+    // ═══ QUALITY GATE: Don't charge if results are garbage ═══
+    const txCount = analysisResult.transactions?.length || 0;
+    const pageEstimate = Math.max(1, Math.ceil(text.length / 3000));
+    let creditCharged = false;
+    let qualityWarning: string | null = null;
+
+    const qualityTooLow = (
+      (pageEstimate >= 2 && txCount < 5) ||
+      (text.length > 5000 && txCount < 3)
+    );
+
+    if (qualityTooLow) {
+      qualityWarning = `Only ${txCount} transactions extracted from ~${pageEstimate} pages. This may be a scanned PDF or unusual format. No credit was charged — try re-uploading or using a different PDF export from your bank.`;
+      creditCharged = false;
+    } else if (shouldChargeCredit) {
+      // Deduct credit — quality is good enough
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { credits: { decrement: 1 } },
+      });
+      creditCharged = true;
+    }
 
     // If taxYearId provided, save transactions to DB
     let replacedMonth = false;
     if (taxYearId && analysisResult.transactions) {
-      // User-selected month takes priority, then AI detection, then transaction date fallback
       const monthLabel = selectedMonth || normalizeMonthLabel(
         analysisResult.summary?.statementPeriod,
         analysisResult.transactions
@@ -271,7 +323,6 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      const pageEstimate = Math.max(1, Math.ceil(text.length / 3000));
       await prisma.statementUpload.create({
         data: {
           userId: user.id,
@@ -307,17 +358,37 @@ export async function POST(request: NextRequest) {
         }));
 
       await prisma.transaction.createMany({ data: txData });
+
+      // ═══ UPDATE CONTEXT: Accumulate vendor knowledge ═══
+      if (txCount > 0) {
+        const newContext = buildContextFromTransactions(analysisResult.transactions);
+        const updatedContext = existingContext
+          ? mergeContext(existingContext, newContext)
+          : newContext;
+
+        await prisma.taxYear.update({
+          where: { id: taxYearId },
+          data: { contextJson: updatedContext as any },
+        });
+      }
     }
+
+    const creditsRemaining = creditCharged ? user.credits - 1 : user.credits;
 
     return NextResponse.json({
       success: true,
       analysis: analysisResult,
-      creditsRemaining: user.credits - 1,
+      creditsRemaining: isAdmin ? 999 : creditsRemaining,
+      creditCharged,
+      isReanalysis,
+      isAdmin,
+      qualityWarning,
       profileComplete: user.taxProfileComplete,
       replacedMonth,
     });
   } catch (error: any) {
     console.error('Analysis error:', error);
+    // Credit NOT deducted on errors — we never reached the deduction point
     return NextResponse.json({ error: error?.message || 'Analysis failed' }, { status: 500 });
   }
 }

@@ -53,6 +53,7 @@ model User {
   taxReports    TaxReport[]
   payments      Payment[]
   statements    StatementUpload[]
+  checkpoints   TaxCheckpoint[]
   
   @@map("users")
 }
@@ -73,6 +74,9 @@ model TaxYear {
   taxWithDeductions Decimal? @db.Decimal(12, 2)
   taxSavings        Decimal? @db.Decimal(12, 2)
   
+  // AI context accumulation — grows with each analysis
+  contextJson       Json?    // Vendor map, income sources, user corrections
+  
   status        TaxYearStatus @default(IN_PROGRESS)
   
   createdAt     DateTime @default(now())
@@ -84,6 +88,7 @@ model TaxYear {
   deductions    Deduction[]
   reports       TaxReport[]
   statements    StatementUpload[]
+  checkpoints   TaxCheckpoint[]
   
   @@unique([userId, yearLabel])
   @@map("tax_years")
@@ -222,6 +227,35 @@ model StatementUpload {
   taxYear     TaxYear @relation(fields: [taxYearId], references: [id])
   
   @@map("statement_uploads")
+}
+
+// ─── Tax Checkpoints (save-point documents for tax memory) ──
+model TaxCheckpoint {
+  id              String   @id @default(cuid())
+  userId          String
+  taxYearId       String
+  
+  title           String   // e.g. "Checkpoint — 8/12 months analyzed"
+  content         String   // Full markdown content
+  
+  // Snapshot metadata at time of creation
+  monthsAnalyzed    Int      @default(0)
+  totalIncome       Decimal? @db.Decimal(12, 2)
+  totalDeductions   Decimal? @db.Decimal(12, 2)
+  transactionCount  Int      @default(0)
+  
+  // AI Deep Review (costs 1 credit — triple-check your results)
+  reviewNotes     String?  // AI review markdown
+  reviewQuestion  String?  // User's specific question (if any)
+  reviewedAt      DateTime?
+  
+  createdAt       DateTime @default(now())
+  
+  // Relations
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taxYear         TaxYear @relation(fields: [taxYearId], references: [id])
+  
+  @@map("tax_checkpoints")
 }
 
 // ─── Enums ──────────────────────────────────────────────

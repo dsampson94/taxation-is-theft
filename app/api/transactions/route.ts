@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
+import { addUserCorrection, type TaxYearContext } from '@/app/lib/context-builder';
 
 // GET /api/transactions?taxYearId=xxx
 export async function GET(request: NextRequest) {
@@ -68,6 +69,7 @@ export async function PATCH(request: NextRequest) {
     // Verify ownership
     const existing = await prisma.transaction.findFirst({
       where: { id, userId: authUser.userId },
+      select: { id: true, taxYearId: true, description: true, category: true, isDeductible: true, deductiblePct: true },
     });
     if (!existing) {
       return NextResponse.json({ error: 'Transaction not found' }, { status: 404 });
@@ -83,6 +85,40 @@ export async function PATCH(request: NextRequest) {
         userOverride: true,
       },
     });
+
+    // Update tax year context with this user correction so future analyses learn
+    if (existing.taxYearId && (category || isDeductible !== undefined)) {
+      try {
+        const taxYear = await prisma.taxYear.findUnique({
+          where: { id: existing.taxYearId },
+          select: { contextJson: true },
+        });
+        const ctx = (taxYear?.contextJson as unknown as TaxYearContext) || {
+          vendorMap: {}, incomeSources: [], userCorrections: [], analysisNotes: '', lastUpdated: new Date().toISOString(),
+        };
+        const updatedCtx = addUserCorrection(
+          ctx,
+          existing.description,
+          {
+            category: existing.category || 'OTHER',
+            deductible: existing.isDeductible,
+            pct: existing.deductiblePct,
+          },
+          {
+            category: category || existing.category || 'OTHER',
+            deductible: isDeductible ?? existing.isDeductible,
+            pct: deductiblePct ?? existing.deductiblePct,
+          },
+          notes || undefined
+        );
+        await prisma.taxYear.update({
+          where: { id: existing.taxYearId },
+          data: { contextJson: updatedCtx as any },
+        });
+      } catch (ctxErr) {
+        console.error('Context update failed (non-critical):', ctxErr);
+      }
+    }
 
     return NextResponse.json({ transaction: updated });
   } catch (error) {

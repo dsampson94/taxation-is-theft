@@ -3,6 +3,8 @@ import { getAuthUser } from '@/app/lib/auth';
 import { prisma } from '@/app/lib/db';
 
 // GET /api/transactions/search?q=jeff+meyer&taxYearId=optional
+// Descriptions are encrypted at rest, so we fetch all user transactions
+// (decrypted by Prisma middleware) and filter in memory.
 export async function GET(request: NextRequest) {
   try {
     const authUser = await getAuthUser();
@@ -18,52 +20,41 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Search query must be at least 2 characters' }, { status: 400 });
     }
 
-    // Build where clause: user's transactions matching description
-    const where: any = {
-      userId: authUser.userId,
-      description: { contains: query, mode: 'insensitive' },
-    };
+    // Fetch all user transactions (decrypted by middleware) and filter in memory
+    const where: any = { userId: authUser.userId };
     if (taxYearId) where.taxYearId = taxYearId;
 
-    const transactions = await prisma.transaction.findMany({
+    const allTransactions = await prisma.transaction.findMany({
       where,
       orderBy: { date: 'desc' },
-      take: 200,
       include: {
         taxYear: { select: { yearLabel: true } },
       },
     });
 
-    // Also check against category and notes
-    const categoryMatches = await prisma.transaction.findMany({
-      where: {
-        userId: authUser.userId,
-        ...(taxYearId ? { taxYearId } : {}),
-        id: { notIn: transactions.map(t => t.id) },
-        OR: [
-          { category: { contains: query, mode: 'insensitive' } },
-          { userCategory: { contains: query, mode: 'insensitive' } },
-          { notes: { contains: query, mode: 'insensitive' } },
-        ],
-      },
-      orderBy: { date: 'desc' },
-      take: 50,
-      include: {
-        taxYear: { select: { yearLabel: true } },
-      },
-    });
+    const queryLower = query.toLowerCase();
+    const queryWords = queryLower.split(/\s+/);
 
-    const allResults = [...transactions, ...categoryMatches];
+    const results = allTransactions.filter((t) => {
+      const desc = (t.description || '').toLowerCase();
+      const cat = (t.category || '').toLowerCase();
+      const userCat = (t.userCategory || '').toLowerCase();
+      const notes = (t.notes || '').toLowerCase();
+      const searchable = `${desc} ${cat} ${userCat} ${notes}`;
+
+      // All query words must appear somewhere in the searchable text
+      return queryWords.every((w) => searchable.includes(w));
+    }).slice(0, 200);
 
     // Compute totals
-    const totalAmount = allResults.reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
-    const incomeResults = allResults.filter(t => t.type === 'INCOME');
-    const expenseResults = allResults.filter(t => t.type === 'EXPENSE');
+    const totalAmount = results.reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
+    const incomeResults = results.filter(t => t.type === 'INCOME');
+    const expenseResults = results.filter(t => t.type === 'EXPENSE');
 
     return NextResponse.json({
-      results: allResults,
+      results,
       summary: {
-        total: allResults.length,
+        total: results.length,
         totalAmount,
         incomeCount: incomeResults.length,
         expenseCount: expenseResults.length,

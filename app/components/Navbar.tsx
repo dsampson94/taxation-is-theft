@@ -45,6 +45,7 @@ export default function Navbar() {
                   { label: 'Profile', href: '/tax-profile' },
                   { label: 'Upload', href: '/upload' },
                   { label: 'Transactions', href: '/transactions' },
+                  { label: 'Search', href: '/search' },
                   { label: 'Report', href: '/report' },
                   { label: 'Review', href: '/checkpoints' },
                 ].map((item, i) => (
@@ -152,6 +153,9 @@ export default function Navbar() {
                 </Link>
                 <Link href="/transactions" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Transactions
+                </Link>
+                <Link href="/search" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg" onClick={() => setMobileOpen(false)}>
+                  Search
                 </Link>
                 <Link href="/report" className="block py-2.5 px-2 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Report
